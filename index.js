@@ -44,6 +44,7 @@ fastify.register(require('./routes/destination.routes'), { prefix: '/api' });
 
 fastify.listen({port:process.env.PORT || 3000, host: "0.0.0.0"},()=>{
       console.log("server runing")
+      console.log("url=",process.env.MONGODB_URI)
     })
   
 
