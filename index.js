@@ -26,9 +26,9 @@ fastify.register(require('@fastify/mongodb'), {
 // Basic route
 fastify.get('/', async () => {
   return {
-    message: '✅ Fastify API running on Vercel!',
-    env: process.env.NODE_ENV || 'unknown',
-    time: new Date().toISOString()
+    message: '✅ Fastify Server is running with MongoDb!',
+   status:"OK",
+    timestamp: new Date().toISOString()
   };
 });
 
@@ -42,8 +42,8 @@ fastify.register(require('./routes/blog.routes'), { prefix: '/api' });
 fastify.register(require('./routes/blogCategory.route'), { prefix: '/api' });
 fastify.register(require('./routes/destination.routes'), { prefix: '/api' });
 
-// ✅ Instead of listen(), export as serverless handler for Vercel
-module.exports = async (req, res) => {
-  await fastify.ready();
-  fastify.server.emit('request', req, res);
-};
+fastify.listen({port:process.env.PORT || 3000, host: "0.0.0.0"},()=>{
+      console.log("server runing")
+    })
+  
+
