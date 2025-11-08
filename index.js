@@ -1,4 +1,4 @@
-const fastify = require('fastify')({ logger: false });
+const fastify = require('fastify')({ logger: true });
 require('dotenv').config();
 
 const { MONGODB_URI } = require('./config/database');
@@ -27,7 +27,7 @@ fastify.register(require('@fastify/mongodb'), {
 fastify.get('/', async () => {
   return {
     message: '✅ Fastify Server is running with MongoDb!',
-   status:"OK",
+    status: "OK",
     timestamp: new Date().toISOString()
   };
 });
@@ -42,9 +42,17 @@ fastify.register(require('./routes/blog.routes'), { prefix: '/api' });
 fastify.register(require('./routes/blogCategory.route'), { prefix: '/api' });
 fastify.register(require('./routes/destination.routes'), { prefix: '/api' });
 
-fastify.listen({port:process.env.PORT || 3000, host: "0.0.0.0"},()=>{
-      console.log("server runing")
-      console.log("url=",process.env.MONGODB_URI)
-    })
-  
+// ✅ Use async start function for stability on Render
+const start = async () => {
+  try {
+    const port = process.env.PORT || 3001;
+    await fastify.listen({ port, host: '0.0.0.0' });
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`🌍 MongoDB URI: ${process.env.MONGODB_URI}`);
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
 
+start();
