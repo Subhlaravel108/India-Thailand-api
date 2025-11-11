@@ -41,7 +41,7 @@ fastify.register(require('./routes/tourRoutes'), { prefix: '/api' });
 fastify.register(require('./routes/blog.routes'), { prefix: '/api' });
 fastify.register(require('./routes/blogCategory.route'), { prefix: '/api' });
 fastify.register(require('./routes/destination.routes'), { prefix: '/api' });
-
+fastify.register(require("./routes/contact.routes"),{prefix:'/api'})
 // ✅ Use async start function for stability on Render
 const start = async () => {
   try {

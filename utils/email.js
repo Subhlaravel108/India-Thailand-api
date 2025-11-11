@@ -17,7 +17,8 @@ const createTransporter = () => {
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: parseInt(process.env.EMAIL_PORT) || 465,
-      secure: parseInt(process.env.EMAIL_PORT) === 465, // true for 465, false for other ports
+      // secure: parseInt(process.env.EMAIL_PORT) === 465, // true for 465, false for other ports
+      secure:true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_APP_PASSWORD
@@ -115,10 +116,79 @@ const sendResetPasswordEmail = async (email, resetToken) => {
   }
 };
 
+// Send Contact Form Email
+const sendContactEmail = async (contactData) => {
+  try {
+    const transporter = createTransporter();
+    await transporter.verify()
+  .then(() => console.log("✅ SMTP connection verified successfully"))
+  .catch(err => console.error("❌ SMTP verification failed:", err));
+    const { name, lastname, email, phone, travelInterest, message } = contactData;
+
+     console.log("✅ Trying to send email to:", email);
+    console.log("📤 Using SMTP:", process.env.EMAIL_HOST, process.env.EMAIL_PORT);
+    console.log("📧 Sending from:", process.env.EMAIL_USER);
+
+    const userMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Thank you for contacting us!',
+      html: `
+        ${emailHeader}
+        <div style="padding: 20px; background-color: #f9f9f9;">
+          <h2 style="color: #333;">Hello ${name} 👋</h2>
+          <p style="color: #666;">Thank you for contacting us regarding your interest in <b>${travelInterest}</b>.</p>
+          <p style="color: #666;">We’ve received your message and our team will get back to you soon.</p>
+          <p style="margin-top: 15px; color: #555;">Your Message:</p>
+          <blockquote style="border-left: 4px solid #4CAF50; padding-left: 10px; color: #333;">${message}</blockquote>
+          <p>Best regards,<br/>Tours Support Team</p>
+        </div>
+        ${emailFooter}
+      `
+    };
+
+    const userMailInfo=await transporter.sendMail(userMailOptions)
+    console.log("✅ User email sent:", userMailInfo.messageId);
+
+     const adminTransporter = createTransporter();
+
+    const adminMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // send to admin or default email
+      subject: 'New Contact Inquiry Received',
+      html: `
+        ${emailHeader}
+        <div style="padding: 20px; background-color: #f9f9f9;">
+          <h2 style="color: #333;">New Contact Inquiry</h2>
+          <p><b>Name:</b> ${name} ${lastname}</p>
+          <p><b>Email:</b> ${email}</p>
+          <p><b>Phone:</b> ${phone}</p>
+          <p><b>Travel Interest:</b> ${travelInterest}</p>
+          <p><b>Message:</b><br/>${message}</p>
+        </div>
+        ${emailFooter}
+      `
+    };
+
+    // await transporter.sendMail(userMailOptions);
+    // await transporter.sendMail(adminMailOptions);
+
+    const adminMailInfo = await adminTransporter.sendMail(adminMailOptions);
+    console.log("✅ Admin email sent:", adminMailInfo.messageId);
+
+    return { success: true, message: 'Emails sent successfully.' };
+  } catch (error) {
+    console.error('Error sending contact emails:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+
 module.exports = {
   generateOTP,
   sendOTPEmail,
-  sendResetPasswordEmail
+  sendResetPasswordEmail,
+  sendContactEmail
 };
 
 
