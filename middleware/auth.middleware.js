@@ -8,7 +8,6 @@ const authMiddleware = async (req, reply) => {
       });
     }
     
-
     const token = authHeader.split(" ")[1];
 
     const decoded = await req.jwtVerify(); // ✅ Verify token properly
