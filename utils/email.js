@@ -120,14 +120,12 @@ const sendResetPasswordEmail = async (email, resetToken) => {
 const sendContactEmail = async (contactData) => {
   try {
     const transporter = createTransporter();
-    await transporter.verify()
-  .then(() => console.log("✅ SMTP connection verified successfully"))
-  .catch(err => console.error("❌ SMTP verification failed:", err));
+  
     const { name, lastname, email, phone, travelInterest, message } = contactData;
 
      console.log("✅ Trying to send email to:", email);
-    console.log("📤 Using SMTP:", process.env.EMAIL_HOST, process.env.EMAIL_PORT);
-    console.log("📧 Sending from:", process.env.EMAIL_USER);
+    // console.log("📤 Using SMTP:", process.env.EMAIL_HOST, process.env.EMAIL_PORT);
+    // console.log("📧 Sending from:", process.env.EMAIL_USER);
 
     const userMailOptions = {
       from: process.env.EMAIL_USER,
@@ -170,9 +168,6 @@ const sendContactEmail = async (contactData) => {
       `
     };
 
-    // await transporter.sendMail(userMailOptions);
-    // await transporter.sendMail(adminMailOptions);
-
     const adminMailInfo = await adminTransporter.sendMail(adminMailOptions);
     console.log("✅ Admin email sent:", adminMailInfo.messageId);
 
@@ -183,12 +178,85 @@ const sendContactEmail = async (contactData) => {
   }
 };
 
+// Send Booking Confirmation Email
+const sendBookingEmail = async (bookingData) => {
+  try {
+    const transporter = createTransporter();
+    const { fullName, email, phone, destination, packageType, travelers, travelDate, message } = bookingData;
+
+    console.log("✅ Trying to send booking email to:", email);
+
+    // 📧 User confirmation email
+    const userMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `Booking Confirmation - ${destination}`,
+      html: `
+        ${emailHeader}
+        <div style="padding: 20px; background-color: #f9f9f9;">
+          <h2 style="color: #333;">Hello ${fullName} 👋</h2>
+          <p style="color: #666;">Thank you for booking your trip with us!</p>
+          <p style="color: #666;">Here are your booking details:</p>
+          <ul style="color: #333; line-height: 1.6;">
+            <li><b>Destination:</b> ${destination}</li>
+            <li><b>Package Type:</b> ${packageType}</li>
+            <li><b>Travelers:</b> ${travelers}</li>
+            <li><b>Travel Date:</b> ${travelDate}</li>
+            <li><b>Phone:</b> ${phone}</li>
+          </ul>
+          ${message ? `<p><b>Special Request:</b> ${message}</p>` : ""}
+          <p style="margin-top: 15px;">Our team will contact you soon to finalize your trip details.</p>
+          <p>Best regards,<br/>Tours Booking Team</p>
+        </div>
+        ${emailFooter}
+      `
+    };
+
+    const userMailInfo = await transporter.sendMail(userMailOptions);
+    console.log("✅ Booking email sent to user:", userMailInfo.messageId);
+
+    // 📧 Admin notification email
+    const adminTransporter = createTransporter();
+    const adminMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject: "New Booking Request Received",
+      html: `
+        ${emailHeader}
+        <div style="padding: 20px; background-color: #f9f9f9;">
+          <h2 style="color: #333;">New Booking Request</h2>
+          <p><b>Full Name:</b> ${fullName}</p>
+          <p><b>Email:</b> ${email}</p>
+          <p><b>Phone:</b> ${phone}</p>
+          <p><b>Destination:</b> ${destination}</p>
+          <p><b>Package Type:</b> ${packageType}</p>
+          <p><b>Travelers:</b> ${travelers}</p>
+          <p><b>Travel Date:</b> ${travelDate}</p>
+          ${message ? `<p><b>Special Request:</b> ${message}</p>` : ""}
+        </div>
+        ${emailFooter}
+      `
+    };
+
+    // console.log("admin email=",process.env.ADMIN_EMAIL)
+    const adminMailInfo = await adminTransporter.sendMail(adminMailOptions);
+    console.log("✅ Admin booking email sent:", adminMailInfo.messageId);
+
+    return { success: true, message: "Booking emails sent successfully" };
+  } catch (error) {
+    console.error("❌ Error sending booking email:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+
 
 module.exports = {
   generateOTP,
   sendOTPEmail,
   sendResetPasswordEmail,
-  sendContactEmail
+  sendContactEmail,
+  sendBookingEmail
 };
 
 

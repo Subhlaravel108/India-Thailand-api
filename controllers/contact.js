@@ -18,7 +18,7 @@ exports.Contact = async (req, reply) => {
     const body = req.body;
     await createContactSchema.validate(body, { abortEarly: false });
 
-    const db = req.server?.mongo?.db;
+    const db = req.mongo?.db || req.server?.mongo?.db;
     if (!db) {
       return reply.code(500).send({
         success: false,
@@ -41,12 +41,14 @@ exports.Contact = async (req, reply) => {
     const insertResult = await contactCol.insertOne(contactData);
     console.log("📩 New contact submitted:", contactData.email);
 
-    let emailResult = { success: false };
-    try {
-      emailResult = await sendContactEmail(body);
-    } catch (emailErr) {
-      console.error("❌ Email sending exception:", emailErr);
-    }
+    // let emailResult = { success: false };
+    // try {
+    //   emailResult = await sendContactEmail(body);
+    // } catch (emailErr) {
+    //   console.error("❌ Email sending exception:", emailErr);
+    // }
+
+    const emailResult=await  sendContactEmail(body)
 
     if (!emailResult.success) {
       return reply.code(200).send({
