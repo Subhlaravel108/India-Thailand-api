@@ -1,12 +1,13 @@
 const authMiddleware = require("../middleware/auth.middleware");
+
 const userRoutes = async (fastify, options) => {
-  // Get all users (except admin) + search + pagination
-  fastify.get("/users",{preHandler:authMiddleware}, async (request, reply) => {
+  // ✅ Get all users (except admin) + search + pagination (Protected route)
+  fastify.get("/users", { preHandler: authMiddleware }, async (request, reply) => {
     try {
       const db = request.server.mongo.db;
       const usersCollection = db.collection("Users");
 
-      // Query params: search, page, limit
+      // Query params
       const { search, page = 1, limit = 10 } = request.query;
 
       // Convert page & limit to number
@@ -14,10 +15,10 @@ const userRoutes = async (fastify, options) => {
       const limitNumber = parseInt(limit);
       const skip = (pageNumber - 1) * limitNumber;
 
-      // Filter object (exclude admin)
+      // Base filter (exclude admin)
       const filter = { role: { $ne: "admin" } };
 
-      // Search filter (optional)
+      // Optional search
       if (search) {
         filter.$or = [
           { name: { $regex: search, $options: "i" } },
@@ -26,10 +27,10 @@ const userRoutes = async (fastify, options) => {
         ];
       }
 
-      // Get total count for pagination
+      // Total count for pagination
       const totalUsers = await usersCollection.countDocuments(filter);
 
-      // Fetch users with pagination
+      // Fetch paginated users
       const users = await usersCollection
         .find(filter, { projection: { password: 0, otp: 0 } })
         .sort({ createdAt: -1 })
@@ -37,9 +38,10 @@ const userRoutes = async (fastify, options) => {
         .limit(limitNumber)
         .toArray();
 
-      // Return paginated response
+      // Response
       return reply.status(200).send({
         success: true,
+        message: "Users fetched successfully",
         data: users,
         pagination: {
           total: totalUsers,
@@ -49,7 +51,7 @@ const userRoutes = async (fastify, options) => {
         },
       });
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("❌ Error fetching users:", error);
       reply.status(500).send({
         success: false,
         message: "Server error",
