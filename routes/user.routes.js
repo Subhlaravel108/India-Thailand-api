@@ -1,7 +1,7 @@
 const authMiddleware = require("../middleware/auth.middleware");
 const userRoutes = async (fastify, options) => {
   // Get all users (except admin) + search + pagination
-  fastify.get("/users",{preHandlder:authMiddleware}, async (request, reply) => {
+  fastify.get("/users",{preHandler:authMiddleware}, async (request, reply) => {
     try {
       const db = request.server.mongo.db;
       const usersCollection = db.collection("Users");
