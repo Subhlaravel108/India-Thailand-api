@@ -80,3 +80,66 @@ exports.Contact = async (req, reply) => {
     });
   }
 };
+
+
+exports.getAllContacts = async (req, reply) => {
+  try {
+    const db = req.mongo?.db || req.server?.mongo?.db;
+    if (!db) {
+      return reply.code(500).send({
+        success: false,
+        message: "Database connection not available",
+      });
+    }
+
+    const contactsCol = db.collection("contact"); // plural name rakho consistency ke liye
+
+    // 🔹 Query parameters (defaults)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search ? req.query.search.trim() : "";
+
+    // 🔹 Build search filter
+    const filter = {};
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { number: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 🔹 Count total documents (for pagination)
+    const totalContacts = await contactsCol.countDocuments(filter);
+
+    // 🔹 Fetch contacts with pagination
+    const contacts = await contactsCol
+      .find(filter)
+      .sort({ createdAt: -1 }) // latest first
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray();
+
+    // 🔹 Pagination info
+    const totalPages = Math.ceil(totalContacts / limit);
+
+    return reply.code(200).send({
+      success: true,
+      message: "Contacts fetched successfully",
+      pagination: {
+        total: totalContacts,
+        page,
+        limit,
+        totalPages,
+      },
+      data: contacts,
+    });
+  } catch (err) {
+    console.error("Get All Contacts Error:", err);
+    return reply.code(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
