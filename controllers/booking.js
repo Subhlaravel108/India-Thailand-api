@@ -69,3 +69,56 @@ exports.Booking = async (req, reply) => {
     });
   }
 };
+
+
+
+exports.getAllBookings=async(req,reply)=>{
+    try{
+        const db=req.mongo?.db || req.server.mongo.db
+        if(!db){
+          return reply.code(500).send({
+            success:false,
+            message:"Database connection not available"
+          })
+        }
+
+        const bookingCol=await db.collection("bookings")
+        const page=parseInt(req.query.page) || 1
+        const limit=parseInt(req.query.limit) || 10
+        const search=req.query.search ? req.query.search.trim() : ""
+
+       
+       const filter = {};
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { number: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+    const totalBookings= await bookingCol.countDocuments(filter)
+
+    const bookings=  await bookingCol.find(filter).sort({createdAt: -1}).skip((page-1) * limit).limit(limit).toArray()
+
+    const totalPages= Math.ceil(totalBookings/limit)
+
+     return reply.code(200).send({
+      success: true,
+      message: "Bookings fetched successfully",
+      pagination: {
+        total: totalBookings,
+        page,
+        limit,
+        totalPages,
+      },
+      data: bookings,
+    });
+  } catch (err) {
+    console.error("Get All Bookings Error:", err);
+    return reply.code(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
