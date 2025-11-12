@@ -1,44 +1,58 @@
 const userRoutes = async (fastify, options) => {
-  // Get all users (except admin) + search functionality
-  fastify.get('/users', async (request, reply) => {
+  // Get all users (except admin) + search + pagination
+  fastify.get("/users", async (request, reply) => {
     try {
       const db = request.server.mongo.db;
-      const usersCollection = db.collection('Users');
+      const usersCollection = db.collection("Users");
 
-      // Query params se search keyword lo
-      const { search } = request.query;
+      // Query params: search, page, limit
+      const { search, page = 1, limit = 10 } = request.query;
 
-      // Filter object initialize karo
-      const filter = {
-        role: { $ne: 'admin' } // admin role ko exclude karega
-      };
+      // Convert page & limit to number
+      const pageNumber = parseInt(page);
+      const limitNumber = parseInt(limit);
+      const skip = (pageNumber - 1) * limitNumber;
 
-      // Agar search query di gayi hai to name/email/phone pe search karega
+      // Filter object (exclude admin)
+      const filter = { role: { $ne: "admin" } };
+
+      // Search filter (optional)
       if (search) {
         filter.$or = [
-          { name: { $regex: search, $options: 'i' } },   // name match
-          { email: { $regex: search, $options: 'i' } },  // email match
-          { phone: { $regex: search, $options: 'i' } }   // phone match
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
         ];
       }
 
-      // Mongo query execute karo
+      // Get total count for pagination
+      const totalUsers = await usersCollection.countDocuments(filter);
+
+      // Fetch users with pagination
       const users = await usersCollection
         .find(filter, { projection: { password: 0, otp: 0 } })
-        .sort({ createdAt: -1 }) // latest users first
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNumber)
         .toArray();
 
+      // Return paginated response
       return reply.status(200).send({
         success: true,
-        data: users
+        data: users,
+        pagination: {
+          total: totalUsers,
+          page: pageNumber,
+          limit: limitNumber,
+          totalPages: Math.ceil(totalUsers / limitNumber),
+        },
       });
-
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
       reply.status(500).send({
         success: false,
-        message: 'Server error',
-        error: error.message
+        message: "Server error",
+        error: error.message,
       });
     }
   });
