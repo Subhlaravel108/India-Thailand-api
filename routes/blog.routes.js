@@ -12,8 +12,11 @@ async function blogRoutes(fastify) {
   
     
     fastify.get("/blog/:slug",{preHandler:authMiddleware}, getBlogDetailsBySlug);
+    fastify.get("/front/blog/:slug", getBlogDetailsBySlug);
 
     fastify.get("/blog",{preHandler:authMiddleware}, getAllBlogs);
+    
+    fastify.get("/front/blog", getAllBlogs);
 
     // Delete blog by ID (admin only). Remove preHandler if public.
     fastify.delete("/blog/:id",{preHandler:authMiddleware}, deleteBlogById);
