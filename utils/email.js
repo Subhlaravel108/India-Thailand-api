@@ -51,33 +51,102 @@ const sendOTPEmail = async (email, otp) => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Verification Code for Tours App',
+      subject: '✅ Verification Code - Jaipur-Thailand Tour',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-         
-          ${emailHeader}
-          <div style="padding: 20px; background-color: #f9f9f9;">
-            <h2 style="color: #333;">Verification Code</h2>
-            <p style="color: #666; font-size: 16px;">Your OTP for registration is:</p>
-            <div style="background-color: white; padding: 20px; text-align: center; margin: 20px 0; border: 2px solid #4CAF50; border-radius: 5px;">
-              <h1 style="color: #4CAF50; margin: 0; font-size: 32px; letter-spacing: 5px;">${otp}</h1>
-            </div>
-            <p style="color: #666; font-size: 14px;">This OTP will expire in 10 minutes.</p>
-            <p style="color: #666; font-size: 14px;">If you didn't request this code, please ignore this email.</p>
+        ${emailHeader}
+        <div style="padding: 40px;">
+          <!-- Welcome Header -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            
+            <h2 style="color: #1e293b; margin: 0 0 12px 0; font-size: 24px; font-weight: 600;">
+              Verify Your Email Address
+            </h2>
+            <p style="color: #64748b; margin: 0; font-size: 16px; line-height: 1.6;">
+              Welcome to Jaipur-Thailand Tour! Use the code below to complete your registration.
+            </p>
           </div>
-          
-          ${emailFooter}
+
+          <!-- OTP Code Section -->
+          <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 16px; padding: 32px; margin: 30px 0; text-align: center;">
+            <h3 style="color: #065f46; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              Your Verification Code
+            </h3>
+            <div style="background: linear-gradient(135deg, #065f46 0%, #059669 100%); padding: 28px; border-radius: 16px; display: inline-block; margin: 16px 0; box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);">
+              <div style="font-family: 'Courier New', monospace; font-size: 42px; font-weight: 700; color: white; letter-spacing: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                ${otp}
+              </div>
+            </div>
+            <p style="color: #dc2626; margin: 16px 0 0 0; font-size: 14px; font-weight: 600;">
+              ⏰ Expires in 10 minutes
+            </p>
+          </div>
+
+          <!-- Instructions -->
+          <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #0c4a6e; margin: 0 0 16px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+              <span style="margin-right: 12px;">📱</span>
+              How to Verify Your Account
+            </h3>
+            <ol style="color: #0369a1; margin: 0; padding-left: 20px; line-height: 1.6;">
+              <li>Return to the verification page</li>
+              <li>Enter the 6-digit code shown above</li>
+              <li>Click "Verify Email" to complete registration</li>
+              <li>Start exploring amazing travel experiences!</li>
+            </ol>
+          </div>
+
+          <!-- Security Notice -->
+          <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 20px; margin: 30px 0;">
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <div style="background: #d97706; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                <span style="color: white; font-size: 14px; font-weight: bold;">!</span>
+              </div>
+              <div>
+                <h4 style="color: #92400e; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">
+                  Important Security Information
+                </h4>
+                <ul style="color: #92400e; margin: 0; padding-left: 16px; line-height: 1.5; font-size: 14px;">
+                  <li>This code is for your registration only</li>
+                  <li>Never share your verification code with anyone</li>
+                  <li>Our team will never ask for this code</li>
+                  <li>If you didn't request this code, please ignore this email</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin: 30px 0; text-align: center;">
+            <h4 style="color: #475569; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">
+              What's Next After Verification?
+            </h4>
+            <p style="color: #64748b; margin: 0; font-size: 14px; line-height: 1.5;">
+              Once verified, you'll get access to exclusive travel deals,<br>
+              personalized itineraries, and 24/7 travel support!
+            </p>
+          </div>
+
+          <!-- Support Section -->
+          <div style="text-align: center; padding: 20px; background: #f1f5f9; border-radius: 12px;">
+            <p style="color: #475569; margin: 0; font-size: 14px;">
+              Need help? Contact us at 
+              <a href="mailto:support@jaipur-thailand.com" style="color: #3b82f6; text-decoration: none; font-weight: 500;">
+                support@jaipur-thailand.com
+              </a>
+            </p>
+          </div>
         </div>
+        ${emailFooter}
       `
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.messageId);
+    console.log('✅ OTP email sent: ' + info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('❌ Error sending OTP email:', error);
     return { success: false, error: error.message };
   }
 };
@@ -89,29 +158,90 @@ const sendResetPasswordEmail = async (email, resetToken) => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Password Reset Code - Tours App',
+      subject: '🔒 Password Reset Code - Jaipur-Thailand Tour',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          ${emailHeader}
-          <div style="padding: 20px; background-color: #f9f9f9;">
-            <h2 style="color: #333;">Reset Code</h2>
-            <p style="color: #666; font-size: 16px;">Your password reset code is:</p>
-            <div style="background-color: white; padding: 20px; text-align: center; margin: 20px 0; border: 2px solid #f44336; border-radius: 5px;">
-              <h1 style="color: #f44336; margin: 0; font-size: 32px; letter-spacing: 5px;">${resetToken}</h1>
-            </div>
-            <p style="color: #666; font-size: 14px;">This code will expire in 15 minutes.</p>
-            <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
+        ${emailHeader}
+        <div style="padding: 40px;">
+          <!-- Security Header -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #1e293b; margin: 0 0 12px 0; font-size: 24px; font-weight: 600;">
+              Password Reset Request
+            </h2>
+            <p style="color: #64748b; margin: 0; font-size: 16px; line-height: 1.6;">
+              We received a request to reset your password for your Jaipur-Thailand Tour account.
+            </p>
           </div>
-          ${emailFooter}
+
+          <!-- Reset Code Section -->
+          <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 32px; margin: 30px 0; text-align: center;">
+            <h3 style="color: #475569; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              Your Security Code
+            </h3>
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; display: inline-block; margin: 16px 0;">
+              <div style="font-family: 'Courier New', monospace; font-size: 36px; font-weight: 700; color: white; letter-spacing: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                ${resetToken}
+              </div>
+            </div>
+            <p style="color: #ef4444; margin: 16px 0 0 0; font-size: 14px; font-weight: 600;">
+              ⏰ Expires in 10 minutes
+            </p>
+          </div>
+
+          <!-- Instructions -->
+          <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #92400e; margin: 0 0 16px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+              <span style="margin-right: 12px;">📝</span>
+              How to Use This Code
+            </h3>
+            <ol style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.6;">
+              <li>Return to the password reset page</li>
+              <li>Enter the 6-digit code above</li>
+              <li>Create your new password</li>
+              <li>Login with your new credentials</li>
+            </ol>
+          </div>
+
+          <!-- Security Warning -->
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px; margin: 30px 0;">
+            <div style="display: flex; align-items: start; gap: 12px;">
+              <div style="background: #dc2626; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                <span style="color: white; font-size: 14px; font-weight: bold;">!</span>
+              </div>
+              <div>
+                <h4 style="color: #dc2626; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">
+                  Security Alert
+                </h4>
+                <ul style="color: #b91c1c; margin: 0; padding-left: 16px; line-height: 1.5; font-size: 14px;">
+                  <li>Never share this code with anyone</li>
+                  <li>Our team will never ask for your code</li>
+                  <li>This code expires in 15 minutes for security</li>
+                  <li>If you didn't request this, please ignore this email</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Support Info -->
+          <div style="text-align: center; padding: 20px; background: #f1f5f9; border-radius: 12px;">
+            <p style="color: #475569; margin: 0; font-size: 14px;">
+              Need help? Contact our support team at 
+              <a href="mailto:codermat@gmail.com" style="color: #3b82f6; text-decoration: none; font-weight: 500;">
+                codermat@gmail.com
+              </a>
+            </p>
+          </div>
         </div>
+        ${emailFooter}
       `
     };
 
     const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Password reset email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
+    console.error("❌ Error sending reset password email:", error);
     return { success: false, error: error.message };
   }
 };
@@ -123,52 +253,161 @@ const sendContactEmail = async (contactData) => {
   
     const { name, lastname, email, phone, travelInterest, message } = contactData;
 
-     console.log("✅ Trying to send email to:", email);
-    // console.log("📤 Using SMTP:", process.env.EMAIL_HOST, process.env.EMAIL_PORT);
-    // console.log("📧 Sending from:", process.env.EMAIL_USER);
+    console.log("✅ Trying to send email to:", email);
 
     const userMailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Thank you for contacting us!',
+      subject: 'Thank You for Contacting Jaipur-Thailand Tour!',
       html: `
         ${emailHeader}
-        <div style="padding: 20px; background-color: #f9f9f9;">
-          <h2 style="color: #333;">Hello ${name} 👋</h2>
-          <p style="color: #666;">Thank you for contacting us regarding your interest in <b>${travelInterest}</b>.</p>
-          <p style="color: #666;">We’ve received your message and our team will get back to you soon.</p>
-          <p style="margin-top: 15px; color: #555;">Your Message:</p>
-          <blockquote style="border-left: 4px solid #4CAF50; padding-left: 10px; color: #333;">${message}</blockquote>
-          <p>Best regards,<br/>Tours Support Team</p>
+        <div style="padding: 40px;">
+          <!-- Thank You Section -->
+          <div style="text-align: center; margin-bottom: 30px;">
+      
+            <h2 style="color: #1e293b; margin: 0 0 12px 0; font-size: 24px; font-weight: 600;">
+              Thank You, ${name}!
+            </h2>
+            <p style="color: #64748b; margin: 0; font-size: 16px; line-height: 1.6;">
+              We've received your inquiry about <strong style="color: #1e40af;">${travelInterest}</strong> and we're excited to help you plan your journey!
+            </p>
+          </div>
+
+          <!-- Inquiry Summary -->
+          <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #1e293b; margin: 0 0 20px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+              <span style="background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">📝</span>
+              Your Inquiry Summary
+            </h3>
+            <div style="display: grid; gap: 12px;">
+              <div style="display: flex;">
+                <span style="font-weight: 600; color: #475569; min-width: 120px;">Name:</span>
+                <span style="color: #334155;">${name} ${lastname}</span>
+              </div>
+              <div style="display: flex;">
+                <span style="font-weight: 600; color: #475569; min-width: 120px;">Travel Interest:</span>
+                <span style="color: #334155;">${travelInterest}</span>
+              </div>
+              <div style="display: flex;">
+                <span style="font-weight: 600; color: #475569; min-width: 120px;">Your Message:</span>
+                <span style="color: #334155; flex: 1;">${message}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #0c4a6e; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              What Happens Next?
+            </h3>
+            <ul style="color: #0369a1; margin: 0; padding-left: 20px; line-height: 1.6;">
+              <li>Our travel expert will contact you within <strong>24 hours</strong></li>
+              <li>We'll provide customized itinerary options</li>
+              <li>Get the best prices and exclusive deals</li>
+              <li>Complete travel assistance until you return home</li>
+            </ul>
+          </div>
+
+          <!-- Contact Info -->
+          <div style="text-align: center; padding: 24px; background: #f1f5f9; border-radius: 12px;">
+            <h4 style="color: #475569; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">
+              Need Immediate Assistance?
+            </h4>
+            <p style="color: #64748b; margin: 0; font-size: 14px;">
+              📞 ${process.env.CONTACT_PHONE || '+91-9352056337'} | 
+              ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
+            </p>
+          </div>
         </div>
         ${emailFooter}
       `
     };
 
-    const userMailInfo=await transporter.sendMail(userMailOptions)
+    const userMailInfo = await transporter.sendMail(userMailOptions);
     console.log("✅ User email sent:", userMailInfo.messageId);
 
-     const adminTransporter = createTransporter();
-
     const adminMailOptions = {
-      from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // send to admin or default email
-      subject: 'New Contact Inquiry Received',
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject: `🚨 New Contact Inquiry - ${name} ${lastname} (${travelInterest})`,
       html: `
         ${emailHeader}
-        <div style="padding: 20px; background-color: #f9f9f9;">
-          <h2 style="color: #333;">New Contact Inquiry</h2>
-          <p><b>Name:</b> ${name} ${lastname}</p>
-          <p><b>Email:</b> ${email}</p>
-          <p><b>Phone:</b> ${phone}</p>
-          <p><b>Travel Interest:</b> ${travelInterest}</p>
-          <p><b>Message:</b><br/>${message}</p>
+        <div style="padding: 40px;">
+          <!-- Alert Header -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #1e293b; margin: 0 0 8px 0; font-size: 24px; font-weight: 600;">
+              New Contact Inquiry
+            </h2>
+            <p style="color: #64748b; margin: 0; font-size: 16px;">
+              Interested in: <strong>${travelInterest}</strong>
+            </p>
+          </div>
+
+          <!-- Customer Details -->
+          <div style="background: #fef2f2; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #dc2626; margin: 0 0 20px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+              <span style="background: #dc2626; color: white; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">📋</span>
+              Customer Details
+            </h3>
+            <div style="display: grid; gap: 16px;">
+              <div style="display: flex; align-items: start;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 140px;">Full Name:</span>
+                <span style="color: #334155;">${name} ${lastname}</span>
+              </div>
+              <div style="display: flex; align-items: start;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 140px;">Email:</span>
+                <span style="color: #334155;">
+                  <a href="mailto:${email}" style="color: #3b82f6; text-decoration: none;">${email}</a>
+                </span>
+              </div>
+              <div style="display: flex; align-items: start;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 140px;">Phone:</span>
+                <span style="color: #334155;">
+                  <a href="tel:${phone}" style="color: #3b82f6; text-decoration: none;">${phone}</a>
+                </span>
+              </div>
+              <div style="display: flex; align-items: start;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 140px;">Travel Interest:</span>
+                <span style="color: #334155; background: #fecaca; padding: 4px 12px; border-radius: 20px; font-weight: 500;">${travelInterest}</span>
+              </div>
+              <div style="display: flex; align-items: start;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 140px;">Message:</span>
+                <div style="color: #334155; flex: 1; background: white; padding: 16px; border-radius: 8px; border-left: 4px solid #dc2626;">
+                  ${message}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Required -->
+          <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #92400e; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              ⚡ Action Required
+            </h3>
+            <ul style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.6;">
+              <li>Contact customer within <strong>24 hours</strong></li>
+              <li>Prepare customized package for ${travelInterest}</li>
+              <li>Follow up via email and phone</li>
+              <li>Update CRM with customer response</li>
+            </ul>
+          </div>
+
+          <!-- Submission Info -->
+          <div style="background: #f1f5f9; border-radius: 8px; padding: 16px; text-align: center;">
+            <p style="color: #475569; margin: 0; font-size: 14px;">
+              <strong>Received:</strong> ${new Date().toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                dateStyle: 'full', 
+                timeStyle: 'long' 
+              })}
+            </p>
+          </div>
         </div>
         ${emailFooter}
       `
     };
 
-    const adminMailInfo = await adminTransporter.sendMail(adminMailOptions);
+    const adminMailInfo = await transporter.sendMail(adminMailOptions);
     console.log("✅ Admin email sent:", adminMailInfo.messageId);
 
     return { success: true, message: 'Emails sent successfully.' };
@@ -188,25 +427,85 @@ const sendBookingEmail = async (bookingData) => {
 
     // 📧 User confirmation email
     const userMailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: `Booking Confirmation - ${destination}`,
+      subject: `🎉 Booking Confirmation - ${destination} Package`,
       html: `
         ${emailHeader}
-        <div style="padding: 20px; background-color: #f9f9f9;">
-          <h2 style="color: #333;">Hello ${fullName} 👋</h2>
-          <p style="color: #666;">Thank you for booking your trip with us!</p>
-          <p style="color: #666;">Here are your booking details:</p>
-          <ul style="color: #333; line-height: 1.6;">
-            <li><b>Destination:</b> ${destination}</li>
-            <li><b>Package Type:</b> ${packageType}</li>
-            <li><b>Travelers:</b> ${travelers}</li>
-            <li><b>Travel Date:</b> ${travelDate}</li>
-            <li><b>Phone:</b> ${phone}</li>
-          </ul>
-          ${message ? `<p><b>Special Request:</b> ${message}</p>` : ""}
-          <p style="margin-top: 15px;">Our team will contact you soon to finalize your trip details.</p>
-          <p>Best regards,<br/>Tours Booking Team</p>
+        <div style="padding: 40px;">
+          <!-- Confirmation Header -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #1e293b; margin: 0 0 12px 0; font-size: 24px; font-weight: 600;">
+              Booking Confirmed!
+            </h2>
+            <p style="color: #64748b; margin: 0; font-size: 16px; line-height: 1.6;">
+              Thank you for choosing Jaipur-Thailand Tour, ${fullName}!<br>
+              Your ${destination} adventure is being prepared.
+            </p>
+          </div>
+
+          <!-- Booking Details -->
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #065f46; margin: 0 0 20px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+              <span style="background: #059669; color: white; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">📅</span>
+              Booking Details
+            </h3>
+            <div style="display: grid; gap: 16px;">
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #065f46; min-width: 140px;">Destination:</span>
+                <span style="color: #334155; background: #dcfce7; padding: 6px 12px; border-radius: 20px; font-weight: 500;">🌍 ${destination}</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #065f46; min-width: 140px;">Package Type:</span>
+                <span style="color: #334155;">${packageType}</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #065f46; min-width: 140px;">Travelers:</span>
+                <span style="color: #334155;">👥 ${travelers} person(s)</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #065f46; min-width: 140px;">Travel Date:</span>
+                <span style="color: #334155;">📅 ${travelDate}</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #065f46; min-width: 140px;">Contact:</span>
+                <span style="color: #334155;">📞 ${phone}</span>
+              </div>
+              ${message ? `
+                <div style="display: flex; align-items: start;">
+                  <span style="font-weight: 600; color: #065f46; min-width: 140px;">Special Requests:</span>
+                  <div style="color: #334155; flex: 1; background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #059669;">
+                    ${message}
+                  </div>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #0c4a6e; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              🎯 What Happens Next?
+            </h3>
+            <ul style="color: #0369a1; margin: 0; padding-left: 20px; line-height: 1.6;">
+              <li>Our travel expert will contact you within <strong>2 hours</strong></li>
+              <li>You'll receive detailed itinerary and pricing</li>
+              <li>Complete payment to secure your booking</li>
+              <li>Get travel documents and visa assistance</li>
+              <li>24/7 support during your trip</li>
+            </ul>
+          </div>
+
+          <!-- Contact Support -->
+          <div style="text-align: center; padding: 24px; background: #f1f5f9; border-radius: 12px;">
+            <h4 style="color: #475569; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">
+              Need Immediate Assistance?
+            </h4>
+            <p style="color: #64748b; margin: 0; font-size: 14px;">
+              📞 ${process.env.CONTACT_PHONE || '+91 9352056337'} | 
+              ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
+            </p>
+          </div>
         </div>
         ${emailFooter}
       `
@@ -216,30 +515,99 @@ const sendBookingEmail = async (bookingData) => {
     console.log("✅ Booking email sent to user:", userMailInfo.messageId);
 
     // 📧 Admin notification email
-    const adminTransporter = createTransporter();
     const adminMailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
       to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-      subject: "New Booking Request Received",
+      subject: `🚨 NEW BOOKING: ${destination} - ${fullName}`,
       html: `
         ${emailHeader}
-        <div style="padding: 20px; background-color: #f9f9f9;">
-          <h2 style="color: #333;">New Booking Request</h2>
-          <p><b>Full Name:</b> ${fullName}</p>
-          <p><b>Email:</b> ${email}</p>
-          <p><b>Phone:</b> ${phone}</p>
-          <p><b>Destination:</b> ${destination}</p>
-          <p><b>Package Type:</b> ${packageType}</p>
-          <p><b>Travelers:</b> ${travelers}</p>
-          <p><b>Travel Date:</b> ${travelDate}</p>
-          ${message ? `<p><b>Special Request:</b> ${message}</p>` : ""}
+        <div style="padding: 40px;">
+          <!-- Alert Header -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #1e293b; margin: 0 0 8px 0; font-size: 24px; font-weight: 600;">
+              New Booking Request!
+            </h2>
+            <p style="color: #64748b; margin: 0; font-size: 16px;">
+              High priority - Contact within <strong style="color: #dc2626;">2 hours</strong>
+            </p>
+          </div>
+
+          <!-- Booking Details -->
+          <div style="background: #fef2f2; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #dc2626; margin: 0 0 20px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+              <span style="background: #dc2626; color: white; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">💰</span>
+              Booking Details
+            </h3>
+            <div style="display: grid; gap: 16px;">
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Customer:</span>
+                <span style="color: #334155; font-weight: 500;">${fullName}</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Email:</span>
+                <a href="mailto:${email}" style="color: #3b82f6; text-decoration: none;">${email}</a>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Phone:</span>
+                <a href="tel:${phone}" style="color: #3b82f6; text-decoration: none;">${phone}</a>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Destination:</span>
+                <span style="color: #334155; background: #fecaca; padding: 6px 12px; border-radius: 20px; font-weight: 500;">${destination}</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Package:</span>
+                <span style="color: #334155;">${packageType}</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Travelers:</span>
+                <span style="color: #334155;">${travelers} person(s)</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Travel Date:</span>
+                <span style="color: #334155; font-weight: 500;">${travelDate}</span>
+              </div>
+              ${message ? `
+                <div style="display: flex; align-items: start;">
+                  <span style="font-weight: 600; color: #dc2626; min-width: 150px;">Special Requests:</span>
+                  <div style="color: #334155; flex: 1; background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #dc2626;">
+                    ${message}
+                  </div>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Urgent Action -->
+          <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 12px; padding: 24px; margin: 30px 0;">
+            <h3 style="color: #92400e; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+              ⚡ Urgent Action Required
+            </h3>
+            <ul style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.6;">
+              <li>Contact customer within <strong>2 hours</strong></li>
+              <li>Prepare customized itinerary for ${destination}</li>
+              <li>Calculate pricing for ${travelers} person(s)</li>
+              <li>Check availability for ${travelDate}</li>
+              <li>Follow up via phone and email</li>
+            </ul>
+          </div>
+
+          <!-- Submission Info -->
+          <div style="background: #f1f5f9; border-radius: 8px; padding: 16px; text-align: center;">
+            <p style="color: #475569; margin: 0; font-size: 14px;">
+              <strong>Booking Received:</strong> ${new Date().toLocaleString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                dateStyle: 'full', 
+                timeStyle: 'long' 
+              })}
+            </p>
+          </div>
         </div>
         ${emailFooter}
       `
     };
 
-    // console.log("admin email=",process.env.ADMIN_EMAIL)
-    const adminMailInfo = await adminTransporter.sendMail(adminMailOptions);
+    const adminMailInfo = await transporter.sendMail(adminMailOptions);
     console.log("✅ Admin booking email sent:", adminMailInfo.messageId);
 
     return { success: true, message: "Booking emails sent successfully" };
@@ -249,14 +617,151 @@ const sendBookingEmail = async (bookingData) => {
   }
 };
 
+async function sendServiceEmail(payload, serviceType) {
+  try {
+    const transporter = createTransporter();
 
+    const user = payload.email;
+    const name = payload.name || "Customer";
+    const adminTo = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
+    // Compose a simple subject per service
+    const subject = `Thanks for your ${serviceType} request - Jaipur-Thailand Tour`;
+
+    // Build HTML summary of submitted data with better styling
+    const rows = Object.keys(payload)
+      .filter(k => k !== 'serviceType')
+      .map(k => {
+        const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        const value = payload[k] || 'Not provided';
+        return `
+          <tr>
+            <td style="padding:12px 16px; background:#f8fafc; border:1px solid #e2e8f0; font-weight:600; color:#475569; width:30%;">${label}</td>
+            <td style="padding:12px 16px; border:1px solid #e2e8f0; color:#334155; width:70%;">${value}</td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    const userHtml = `
+      ${emailHeader}
+      <div style="padding:40px;">
+        <div style="text-align:center; margin-bottom:30px;">
+        
+          <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">Thank You, ${name}!</h2>
+          <p style="color:#64748b; margin:0; font-size:16px; line-height:1.6;">
+            We've received your <strong style="color:#1e40af;">${serviceType}</strong> request and our team is already working on it.
+          </p>
+        </div>
+
+        <!-- Request Details -->
+        <div style="background:#f8fafc; border-radius:12px; padding:24px; margin:30px 0;">
+          <h3 style="color:#1e293b; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center;">
+            <span style="background:#3b82f6; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">📋</span>
+            Request Details
+          </h3>
+          <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden;">
+            ${rows}
+          </table>
+        </div>
+
+        <!-- Next Steps -->
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:24px; margin:30px 0;">
+          <h3 style="color:#0c4a6e; margin:0 0 16px 0; font-size:18px; font-weight:600;">What Happens Next?</h3>
+          <ul style="color:#0369a1; margin:0; padding-left:20px; line-height:1.6;">
+            <li>Our travel expert will contact you within <strong>24 hours</strong></li>
+            <li>We'll provide the best available options and prices</li>
+            <li>Get ready for an amazing travel experience!</li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div style="text-align:center; padding:24px; background:#f1f5f9; border-radius:12px;">
+          <h4 style="color:#475569; margin:0 0 12px 0; font-size:16px; font-weight:600;">Need Immediate Assistance?</h4>
+          <p style="color:#64748b; margin:0; font-size:14px;">
+            📞 ${process.env.CONTACT_PHONE || '+91 9352056337'} | 
+            ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
+          </p>
+        </div>
+      </div>
+      ${emailFooter}
+    `;
+
+    const adminHtml = `
+      ${emailHeader}
+      <div style="padding:40px;">
+        <div style="text-align:center; margin-bottom:30px;">
+          <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">New ${serviceType} Request</h2>
+          <p style="color:#64748b; margin:0; font-size:16px;">
+            Received from <strong>${name}</strong> (${payload.email})
+          </p>
+        </div>
+
+        <!-- Customer Details -->
+        <div style="background:#fef2f2; border-radius:12px; padding:24px; margin:30px 0;">
+          <h3 style="color:#dc2626; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center;">
+            <span style="background:#dc2626; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">👤</span>
+            Customer Information
+          </h3>
+          <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden;">
+            ${rows}
+          </table>
+        </div>
+
+        <!-- Action Required -->
+        <div style="background:#fffbeb; border:1px solid #fcd34d; border-radius:12px; padding:24px; margin:30px 0;">
+          <h3 style="color:#92400e; margin:0 0 16px 0; font-size:18px; font-weight:600;">Action Required</h3>
+          <ul style="color:#92400e; margin:0; padding-left:20px; line-height:1.6;">
+            <li>Contact customer within <strong>24 hours</strong></li>
+            <li>Provide best available options and pricing</li>
+            <li>Update CRM with customer response</li>
+          </ul>
+        </div>
+
+        <!-- Submission Info -->
+        <div style="background:#f1f5f9; border-radius:8px; padding:16px; text-align:center;">
+          <p style="color:#475569; margin:0; font-size:14px;">
+            <strong>Submitted:</strong> ${new Date().toLocaleString('en-IN', { 
+              timeZone: 'Asia/Kolkata',
+              dateStyle: 'full', 
+              timeStyle: 'long' 
+            })}
+          </p>
+        </div>
+      </div>
+      ${emailFooter}
+    `;
+
+    // Send user email
+    await transporter.sendMail({
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
+      to: user,
+      subject,
+      html: userHtml
+    });
+
+    // Send admin email
+    await transporter.sendMail({
+      from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
+      to: adminTo,
+      subject: `🚨 New ${serviceType} Request - ${name}`,
+      html: adminHtml
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("sendServiceEmail error:", error);
+    return { success: false, error: error.message || String(error) };
+  }
+}
 
 module.exports = {
   generateOTP,
   sendOTPEmail,
   sendResetPasswordEmail,
   sendContactEmail,
-  sendBookingEmail
+  sendBookingEmail,
+  sendServiceEmail
 };
 
 

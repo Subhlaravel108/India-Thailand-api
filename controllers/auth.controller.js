@@ -194,7 +194,7 @@ const resendOTP = async (request, reply) => {
 
     // Generate new OTP
     const otp = generateOTP();
-    const emailResult = await sendOTPEmail(email, otp);
+    const emailResult = await sendResetPasswordEmail(email, otp);
     
     if (!emailResult.success) {
       return reply.status(500).send({
