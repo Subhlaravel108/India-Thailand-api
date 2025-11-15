@@ -1,5 +1,6 @@
 const { createBookingSchema, formatYupErrors } = require("../validators/booking.validation");
 const { sendBookingEmail } = require("../utils/email"); // email bhejne ke liye
+const ExcelJS = require("exceljs");
 
 exports.Booking = async (req, reply) => {
   try {
@@ -122,3 +123,58 @@ exports.getAllBookings=async(req,reply)=>{
     });
   }
 };
+
+
+
+
+exports.exportBookings = async (req, reply) => {
+  try {
+    const bookingCollection = req.server.mongo.db.collection("bookings");
+
+    const bookings = await bookingCollection.find().toArray();
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Bookings");
+
+    worksheet.columns = [
+      { header: "Full Name", key: "fullName", width: 25 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Phone", key: "phone", width: 15 },
+      { header: "Destination", key: "destination", width: 20 },
+      { header: "Package Type", key: "packageType", width: 25 },
+      { header: "Travelers", key: "travelers", width: 10 },
+      { header: "Travel Date", key: "travelDate", width: 20 },
+      { header: "Message", key: "message", width: 30 },
+      { header: "Created At", key: "createdAt", width: 25 },
+    ];
+
+    bookings.forEach((b) => {
+      worksheet.addRow({
+        fullName: b.fullName,
+        email: b.email,
+        phone: b.phone,
+        destination: b.destination,
+        packageType: b.packageType,
+        travelers: b.travelers,
+        travelDate: b.travelDate,
+        message: b.message || "-",
+        createdAt: new Date(b.createdAt).toLocaleString("en-IN"),
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    reply
+      .header(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+      .header("Content-Disposition", "attachment; filename=bookings.xlsx")
+      .send(buffer);
+  } catch (err) {
+    console.log(err);
+    reply.code(500).send({ message: "Failed to export bookings" });
+  }
+};
+
+
