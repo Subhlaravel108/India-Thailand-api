@@ -66,3 +66,14 @@ exports.submitService = async (req, reply) => {
     });
   }
 };
+
+
+exports.getAllService=async(req,reply)=>{
+   const db = req.server?.mongo?.db || req.mongo?.db;
+  const AllServices=await db.collection("services").find().toArray()
+
+  return({
+    success:true,
+    data:AllServices
+  })
+}
