@@ -14,7 +14,7 @@ const authMiddleware = async (req, reply) => {
     req.user = decoded;
   } catch (error) {
     return reply.code(401).send({
-      success: false,
+      success: false, 
       message: "Invalid or expired token",
       error: error.message
     });
