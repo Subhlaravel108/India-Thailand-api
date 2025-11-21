@@ -261,39 +261,103 @@ const sendContactEmail = async (contactData) => {
       subject: 'Thank You for Contacting Jaipur-Thailand Tour!',
       html: `
         ${emailHeader}
-        <div style="padding: 40px;">
-          <!-- Thank You Section -->
-          <div style="text-align: center; margin-bottom: 30px;">
-      
-            <h2 style="color: #1e293b; margin: 0 0 12px 0; font-size: 24px; font-weight: 600;">
-              Thank You, ${name}!
-            </h2>
-            <p style="color: #64748b; margin: 0; font-size: 16px; line-height: 1.6;">
-              We've received your inquiry about <strong style="color: #1e40af;">${travelInterest}</strong> and we're excited to help you plan your journey!
-            </p>
-          </div>
+     <div style="
+  padding: 40px;
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+">
 
-          <!-- Inquiry Summary -->
-          <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin: 30px 0;">
-            <h3 style="color: #1e293b; margin: 0 0 20px 0; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
-              <span style="background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px;">📝</span>
-              Your Inquiry Summary
-            </h3>
-            <div style="display: grid; gap: 12px;">
-              <div style="display: flex;">
-                <span style="font-weight: 600; color: #475569; min-width: 120px;">Name:</span>
-                <span style="color: #334155;">${name} ${lastname}</span>
-              </div>
-              <div style="display: flex;">
-                <span style="font-weight: 600; color: #475569; min-width: 120px;">Travel Interest:</span>
-                <span style="color: #334155;">${travelInterest}</span>
-              </div>
-              <div style="display: flex;">
-                <span style="font-weight: 600; color: #475569; min-width: 120px;">Your Message:</span>
-                <span style="color: #334155; flex: 1;">${message}</span>
-              </div>
-            </div>
-          </div>
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h2 style="
+      color: #1e293b;
+      margin: 0 0 12px 0;
+      font-size: 26px;
+      font-weight: 700;
+    ">
+      Thank You, ${name}!
+    </h2>
+
+    <p style="
+      color: #64748b;
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.6;
+    ">
+      We've received your inquiry about 
+      <strong style="color: #1e40af;">${travelInterest}</strong>.<br/>
+      We’re excited to assist you with your travel plan!
+    </p>
+  </div>
+
+  <!-- Summary Card -->
+  <div style="
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 30px 0;
+    border: 1px solid #e2e8f0;
+  ">
+    <h3 style="
+      color: #1e293b;
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    ">
+      <span style="
+        background: #3b82f6;
+        color: white;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        font-size: 14px;
+      ">📝</span>
+      Inquiry Summary
+    </h3>
+
+    <div style="display: grid; gap: 14px;">
+      
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+        <span style="font-weight: 600; color: #475569;">Name:</span>
+        <span style="color: #334155;">${name} ${lastname}</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+        <span style="font-weight: 600; color: #475569;">Travel Interest:</span>
+        <span style="color: #334155;">${travelInterest}</span>
+      </div>
+
+      <div style="display: block;">
+        <span style="font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Your Message:</span>
+        <div style="
+          background: #ffffff;
+          padding: 12px;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+          color: #334155;
+          line-height: 1.5;
+          white-space: pre-wrap;
+        ">
+          ${message}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p style="text-align: center; color: #64748b; font-size: 14px;">
+    Our team will contact you shortly.  
+    <br/>Have a great day! 🌍✈️
+  </p>
+
+</div>
+
 
           <!-- Next Steps -->
           <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 24px; margin: 30px 0;">
@@ -318,7 +382,7 @@ const sendContactEmail = async (contactData) => {
               ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
             </p>
           </div>
-        </div>
+        </div>  
         ${emailFooter}
       `
     };
@@ -617,6 +681,144 @@ const sendBookingEmail = async (bookingData) => {
   }
 };
 
+// async function sendServiceEmail(payload, serviceType) {
+//   try {
+//     const transporter = createTransporter();
+
+//     const user = payload.email;
+//     const name = payload.name || "Customer";
+//     const adminTo = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
+//     // Compose a simple subject per service
+//     const subject = `Thanks for your ${serviceType} request - Jaipur-Thailand Tour`;
+
+//     // Build HTML summary of submitted data with better styling
+//     const rows = Object.keys(payload)
+//       .filter(k => k !== 'serviceType')
+//       .map(k => {
+//         const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+//         const value = payload[k] || 'Not provided';
+//         return `
+//           <tr>
+//             <td style="padding:12px 16px; background:#f8fafc; border:1px solid #e2e8f0; font-weight:600; color:#475569; width:30%;">${label}</td>
+//             <td style="padding:12px 16px; border:1px solid #e2e8f0; color:#334155; width:70%;">${value}</td>
+//           </tr>
+//         `;
+//       })
+//       .join("");
+
+//     const userHtml = `
+//       ${emailHeader}
+//       <div style="padding:40px;">
+//         <div style="text-align:center; margin-bottom:30px;">
+        
+//           <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">Thank You, ${name}!</h2>
+//           <p style="color:#64748b; margin:0; font-size:16px; line-height:1.6;">
+//             We've received your <strong style="color:#1e40af;">${serviceType}</strong> request and our team is already working on it.
+//           </p>
+//         </div>
+
+//         <!-- Request Details -->
+//         <div style="background:#f8fafc; border-radius:12px; padding:24px; margin:30px 0;">
+//           <h3 style="color:#1e293b; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center;">
+//             <span style="background:#3b82f6; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">📋</span>
+//             Request Details
+//           </h3>
+//           <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden;">
+//             ${rows}
+//           </table>
+//         </div>
+
+//         <!-- Next Steps -->
+//         <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:24px; margin:30px 0;">
+//           <h3 style="color:#0c4a6e; margin:0 0 16px 0; font-size:18px; font-weight:600;">What Happens Next?</h3>
+//           <ul style="color:#0369a1; margin:0; padding-left:20px; line-height:1.6;">
+//             <li>Our travel expert will contact you within <strong>24 hours</strong></li>
+//             <li>We'll provide the best available options and prices</li>
+//             <li>Get ready for an amazing travel experience!</li>
+//           </ul>
+//         </div>
+
+//         <!-- Contact Info -->
+//         <div style="text-align:center; padding:24px; background:#f1f5f9; border-radius:12px;">
+//           <h4 style="color:#475569; margin:0 0 12px 0; font-size:16px; font-weight:600;">Need Immediate Assistance?</h4>
+//           <p style="color:#64748b; margin:0; font-size:14px;">
+//             📞 ${process.env.CONTACT_PHONE || '+91 9352056337'} | 
+//             ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
+//           </p>
+//         </div>
+//       </div>
+//       ${emailFooter}
+//     `;
+
+//     const adminHtml = `
+//       ${emailHeader}
+//       <div style="padding:40px;">
+//         <div style="text-align:center; margin-bottom:30px;">
+//           <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">New ${serviceType} Request</h2>
+//           <p style="color:#64748b; margin:0; font-size:16px;">
+//             Received from <strong>${name}</strong> (${payload.email})
+//           </p>
+//         </div>
+
+//         <!-- Customer Details -->
+//         <div style="background:#fef2f2; border-radius:12px; padding:24px; margin:30px 0;">
+//           <h3 style="color:#dc2626; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center;">
+//             <span style="background:#dc2626; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">👤</span>
+//             Customer Information
+//           </h3>
+//           <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden;">
+//             ${rows}
+//           </table>
+//         </div>
+
+//         <!-- Action Required -->
+//         <div style="background:#fffbeb; border:1px solid #fcd34d; border-radius:12px; padding:24px; margin:30px 0;">
+//           <h3 style="color:#92400e; margin:0 0 16px 0; font-size:18px; font-weight:600;">Action Required</h3>
+//           <ul style="color:#92400e; margin:0; padding-left:20px; line-height:1.6;">
+//             <li>Contact customer within <strong>24 hours</strong></li>
+//             <li>Provide best available options and pricing</li>
+//             <li>Update CRM with customer response</li>
+//           </ul>
+//         </div>
+
+//         <!-- Submission Info -->
+//         <div style="background:#f1f5f9; border-radius:8px; padding:16px; text-align:center;">
+//           <p style="color:#475569; margin:0; font-size:14px;">
+//             <strong>Submitted:</strong> ${new Date().toLocaleString('en-IN', { 
+//               timeZone: 'Asia/Kolkata',
+//               dateStyle: 'full', 
+//               timeStyle: 'long' 
+//             })}
+//           </p>
+//         </div>
+//       </div>
+//       ${emailFooter}
+//     `;
+
+//     // Send user email
+//     await transporter.sendMail({
+//       from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
+//       to: user,
+//       subject,
+//       html: userHtml
+//     });
+
+//     // Send admin email
+//     await transporter.sendMail({
+//       from: `"Jaipur-Thailand Tour" <${process.env.EMAIL_USER}>`,
+//       to: adminTo,
+//       subject: `🚨 New ${serviceType} Request - ${name}`,
+//       html: adminHtml
+//     });
+
+//     return { success: true };
+//   } catch (error) {
+//     console.error("sendServiceEmail error:", error);
+//     return { success: false, error: error.message || String(error) };
+//   }
+// }
+
 async function sendServiceEmail(payload, serviceType) {
   try {
     const transporter = createTransporter();
@@ -636,100 +838,256 @@ async function sendServiceEmail(payload, serviceType) {
         const value = payload[k] || 'Not provided';
         return `
           <tr>
-            <td style="padding:12px 16px; background:#f8fafc; border:1px solid #e2e8f0; font-weight:600; color:#475569; width:30%;">${label}</td>
-            <td style="padding:12px 16px; border:1px solid #e2e8f0; color:#334155; width:70%;">${value}</td>
+            <td style="padding:12px 16px; background:#f8fafc; border:1px solid #e2e8f0; font-weight:600; color:#475569; width:30%; word-break:break-word;">${label}</td>
+            <td style="padding:12px 16px; border:1px solid #e2e8f0; color:#334155; width:70%; word-break:break-word;">${value}</td>
           </tr>
         `;
       })
       .join("");
 
     const userHtml = `
-      ${emailHeader}
-      <div style="padding:40px;">
-        <div style="text-align:center; margin-bottom:30px;">
-        
-          <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">Thank You, ${name}!</h2>
-          <p style="color:#64748b; margin:0; font-size:16px; line-height:1.6;">
-            We've received your <strong style="color:#1e40af;">${serviceType}</strong> request and our team is already working on it.
-          </p>
-        </div>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Thank You - Jaipur-Thailand Tour</title>
+        <style>
+          @media only screen and (max-width: 600px) {
+            .container {
+              padding: 20px !important;
+            }
+            .content {
+              padding: 20px !important;
+            }
+            table {
+              width: 100% !important;
+            }
+            td {
+              display: block !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+            }
+            tr {
+              display: block !important;
+              margin-bottom: 16px !important;
+              border: 1px solid #e2e8f0 !important;
+              border-radius: 8px !important;
+              overflow: hidden !important;
+            }
+            .mobile-label {
+              font-weight: 600 !important;
+              background: #f8fafc !important;
+              padding: 12px 16px !important;
+              border-bottom: 1px solid #e2e8f0 !important;
+            }
+            .mobile-value {
+              padding: 12px 16px !important;
+              background: white !important;
+            }
+            .contact-info p {
+              display: block !important;
+              margin: 8px 0 !important;
+            }
+          }
+        </style>
+      </head>
+      <body style="margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        ${emailHeader}
+        <div class="container" style="max-width:600px; margin:0 auto; background:white;">
+          <div class="content" style="padding:40px;">
+            <!-- Thank You Section -->
+            <div style="text-align:center; margin-bottom:30px;">
+              <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">Thank You, ${name}!</h2>
+              <p style="color:#64748b; margin:0; font-size:16px; line-height:1.6;">
+                We've received your <strong style="color:#1e40af;">${serviceType}</strong> request and our team is already working on it.
+              </p>
+            </div>
 
-        <!-- Request Details -->
-        <div style="background:#f8fafc; border-radius:12px; padding:24px; margin:30px 0;">
-          <h3 style="color:#1e293b; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center;">
-            <span style="background:#3b82f6; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">📋</span>
-            Request Details
-          </h3>
-          <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden;">
-            ${rows}
-          </table>
-        </div>
+            <!-- Request Details -->
+            <div style="background:#f8fafc; border-radius:12px; padding:24px; margin:30px 0;">
+              <h3 style="color:#1e293b; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center; justify-content:center;">
+                <span style="background:#3b82f6; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">📋</span>
+                Request Details
+              </h3>
+              
+              <!-- Desktop Table -->
+              <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden; display:table;" class="desktop-table">
+                ${rows}
+              </table>
+              
+              <!-- Mobile Table -->
+              <div style="display:none;" class="mobile-table">
+                ${Object.keys(payload)
+                  .filter(k => k !== 'serviceType')
+                  .map(k => {
+                    const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    const value = payload[k] || 'Not provided';
+                    return `
+                      <div style="margin-bottom:16px; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
+                        <div class="mobile-label" style="font-weight:600; color:#475569; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">${label}</div>
+                        <div class="mobile-value" style="color:#334155; padding:12px 16px; background:white; word-break:break-word;">${value}</div>
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
 
-        <!-- Next Steps -->
-        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:24px; margin:30px 0;">
-          <h3 style="color:#0c4a6e; margin:0 0 16px 0; font-size:18px; font-weight:600;">What Happens Next?</h3>
-          <ul style="color:#0369a1; margin:0; padding-left:20px; line-height:1.6;">
-            <li>Our travel expert will contact you within <strong>24 hours</strong></li>
-            <li>We'll provide the best available options and prices</li>
-            <li>Get ready for an amazing travel experience!</li>
-          </ul>
-        </div>
+            <!-- Next Steps -->
+            <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:24px; margin:30px 0;">
+              <h3 style="color:#0c4a6e; margin:0 0 16px 0; font-size:18px; font-weight:600; text-align:center;">What Happens Next?</h3>
+              <ul style="color:#0369a1; margin:0; padding-left:20px; line-height:1.6;">
+                <li style="margin-bottom:8px;">Our travel expert will contact you within <strong>24 hours</strong></li>
+                <li style="margin-bottom:8px;">We'll provide the best available options and prices</li>
+                <li>Get ready for an amazing travel experience!</li>
+              </ul>
+            </div>
 
-        <!-- Contact Info -->
-        <div style="text-align:center; padding:24px; background:#f1f5f9; border-radius:12px;">
-          <h4 style="color:#475569; margin:0 0 12px 0; font-size:16px; font-weight:600;">Need Immediate Assistance?</h4>
-          <p style="color:#64748b; margin:0; font-size:14px;">
-            📞 ${process.env.CONTACT_PHONE || '+91 9352056337'} | 
-            ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
-          </p>
+            <!-- Contact Info -->
+            <div style="text-align:center; padding:24px; background:#f1f5f9; border-radius:12px;">
+              <h4 style="color:#475569; margin:0 0 16px 0; font-size:16px; font-weight:600;">Need Immediate Assistance?</h4>
+              <div class="contact-info">
+                <p style="color:#64748b; margin:8px 0; display:block;">
+                  📞 ${process.env.CONTACT_PHONE || '+91 9352056337'}
+                </p>
+                <p style="color:#64748b; margin:8px 0; display:block;">
+                  ✉️ ${process.env.CONTACT_EMAIL || 'codermat@gmail.com'}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      ${emailFooter}
+        ${emailFooter}
+        <script>
+          // Show mobile table on small screens, hide desktop table
+          if (window.innerWidth <= 600) {
+            document.querySelector('.desktop-table').style.display = 'none';
+            document.querySelector('.mobile-table').style.display = 'block';
+          }
+        </script>
+      </body>
+      </html>
     `;
 
     const adminHtml = `
-      ${emailHeader}
-      <div style="padding:40px;">
-        <div style="text-align:center; margin-bottom:30px;">
-          <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">New ${serviceType} Request</h2>
-          <p style="color:#64748b; margin:0; font-size:16px;">
-            Received from <strong>${name}</strong> (${payload.email})
-          </p>
-        </div>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Request - Jaipur-Thailand Tour</title>
+        <style>
+          @media only screen and (max-width: 600px) {
+            .container {
+              padding: 20px !important;
+            }
+            .content {
+              padding: 20px !important;
+            }
+            table {
+              width: 100% !important;
+            }
+            td {
+              display: block !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+            }
+            tr {
+              display: block !important;
+              margin-bottom: 16px !important;
+              border: 1px solid #e2e8f0 !important;
+              border-radius: 8px !important;
+              overflow: hidden !important;
+            }
+            .mobile-label {
+              font-weight: 600 !important;
+              background: #fef2f2 !important;
+              padding: 12px 16px !important;
+              border-bottom: 1px solid #fecaca !important;
+              color: #dc2626 !important;
+            }
+            .mobile-value {
+              padding: 12px 16px !important;
+              background: white !important;
+            }
+          }
+        </style>
+      </head>
+      <body style="margin:0; padding:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        ${emailHeader}
+        <div class="container" style="max-width:600px; margin:0 auto; background:white;">
+          <div class="content" style="padding:40px;">
+            <!-- Alert Header -->
+            <div style="text-align:center; margin-bottom:30px;">
+              <h2 style="color:#1e293b; margin:0 0 12px 0; font-size:24px; font-weight:600;">New ${serviceType} Request</h2>
+              <p style="color:#64748b; margin:0; font-size:16px;">
+                Received from <strong>${name}</strong> (${payload.email})
+              </p>
+            </div>
 
-        <!-- Customer Details -->
-        <div style="background:#fef2f2; border-radius:12px; padding:24px; margin:30px 0;">
-          <h3 style="color:#dc2626; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center;">
-            <span style="background:#dc2626; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">👤</span>
-            Customer Information
-          </h3>
-          <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden;">
-            ${rows}
-          </table>
-        </div>
+            <!-- Customer Details -->
+            <div style="background:#fef2f2; border-radius:12px; padding:24px; margin:30px 0;">
+              <h3 style="color:#dc2626; margin:0 0 20px 0; font-size:18px; font-weight:600; display:flex; align-items:center; justify-content:center;">
+                <span style="background:#dc2626; color:white; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px;">👤</span>
+                Customer Information
+              </h3>
+              
+              <!-- Desktop Table -->
+              <table style="width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden; display:table;" class="desktop-table">
+                ${rows}
+              </table>
+              
+              <!-- Mobile Table -->
+              <div style="display:none;" class="mobile-table">
+                ${Object.keys(payload)
+                  .filter(k => k !== 'serviceType')
+                  .map(k => {
+                    const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    const value = payload[k] || 'Not provided';
+                    return `
+                      <div style="margin-bottom:16px; border:1px solid #fecaca; border-radius:8px; overflow:hidden;">
+                        <div class="mobile-label" style="font-weight:600; color:#dc2626; background:#fef2f2; padding:12px 16px; border-bottom:1px solid #fecaca;">${label}</div>
+                        <div class="mobile-value" style="color:#334155; padding:12px 16px; background:white; word-break:break-word;">${value}</div>
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
 
-        <!-- Action Required -->
-        <div style="background:#fffbeb; border:1px solid #fcd34d; border-radius:12px; padding:24px; margin:30px 0;">
-          <h3 style="color:#92400e; margin:0 0 16px 0; font-size:18px; font-weight:600;">Action Required</h3>
-          <ul style="color:#92400e; margin:0; padding-left:20px; line-height:1.6;">
-            <li>Contact customer within <strong>24 hours</strong></li>
-            <li>Provide best available options and pricing</li>
-            <li>Update CRM with customer response</li>
-          </ul>
-        </div>
+            <!-- Action Required -->
+            <div style="background:#fffbeb; border:1px solid #fcd34d; border-radius:12px; padding:24px; margin:30px 0;">
+              <h3 style="color:#92400e; margin:0 0 16px 0; font-size:18px; font-weight:600; text-align:center;">Action Required</h3>
+              <ul style="color:#92400e; margin:0; padding-left:20px; line-height:1.6;">
+                <li style="margin-bottom:8px;">Contact customer within <strong>24 hours</strong></li>
+                <li style="margin-bottom:8px;">Provide best available options and pricing</li>
+                <li>Update CRM with customer response</li>
+              </ul>
+            </div>
 
-        <!-- Submission Info -->
-        <div style="background:#f1f5f9; border-radius:8px; padding:16px; text-align:center;">
-          <p style="color:#475569; margin:0; font-size:14px;">
-            <strong>Submitted:</strong> ${new Date().toLocaleString('en-IN', { 
-              timeZone: 'Asia/Kolkata',
-              dateStyle: 'full', 
-              timeStyle: 'long' 
-            })}
-          </p>
+            <!-- Submission Info -->
+            <div style="background:#f1f5f9; border-radius:8px; padding:16px; text-align:center;">
+              <p style="color:#475569; margin:0; font-size:14px;">
+                <strong>Submitted:</strong> ${new Date().toLocaleString('en-IN', { 
+                  timeZone: 'Asia/Kolkata',
+                  dateStyle: 'full', 
+                  timeStyle: 'long' 
+                })}
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-      ${emailFooter}
+        ${emailFooter}
+        <script>
+          // Show mobile table on small screens, hide desktop table
+          if (window.innerWidth <= 600) {
+            document.querySelector('.desktop-table').style.display = 'none';
+            document.querySelector('.mobile-table').style.display = 'block';
+          }
+        </script>
+      </body>
+      </html>
     `;
 
     // Send user email

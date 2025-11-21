@@ -1,7 +1,12 @@
 const fastify = require('fastify')({ logger: true });
 require('dotenv').config();
-
+const path = require('path');
 const { MONGODB_URI } = require('./config/database');
+
+fastify.register(require('@fastify/static'), {
+  root: path.join(__dirname, 'public'),
+  prefix: '/public/', // URL me /public/ lagega
+});
 
 // Register Fastify plugins
 fastify.register(require('@fastify/cors'), {
