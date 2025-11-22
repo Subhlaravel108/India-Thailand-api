@@ -1,5 +1,5 @@
 const authController = require('../controllers/auth.controller');
-
+const authMiddleware = require("../middleware/auth.middleware");
 const authRoutes = async (fastify, options) => {
  
 
@@ -26,6 +26,7 @@ const authRoutes = async (fastify, options) => {
   fastify.post('/reset-password', authController.resetPassword);
 
   fastify.post("/user/status/:id",authController.changeUserStatus)
+  fastify.post("/change-password",{preHandler:authMiddleware},authController.changePassword)
 };
 
 module.exports = authRoutes;

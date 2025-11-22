@@ -2,9 +2,24 @@ const bcrypt = require('bcryptjs');
 const { parseRequest } = require('../utils/requestParser');
 const { validateRegister } = require('../utils/validators');
 const { generateOTP, sendOTPEmail,sendResetPasswordEmail } = require('../utils/email');
+const {changePasswordSchema } =require("../validators/changePassword.validator")
 const { mongodb } = require('@fastify/mongodb');
 const { ObjectId } = require('@fastify/mongodb');
+const yup = require("yup");
 // Register user
+
+const formatYupErrors = (yupError) => {
+  const errors = {};
+  if (yupError.inner && yupError.inner.length) {
+    for (const err of yupError.inner) {
+      if (err.path && !errors[err.path]) errors[err.path] = err.message;
+    }
+  } else if (yupError.path) {
+    errors[yupError.path] = yupError.message;
+  }
+  return errors;
+};
+
 const register = async (request, reply) => {
   try {
     const body = await parseRequest(request);
@@ -577,6 +592,75 @@ const changeUserStatus = async (req, reply) => {
   }
 }
 
+
+const changePassword = async (req, reply) => {
+  try {
+    // 🔹 1) Validate Payload using Yup
+    try {
+      await changePasswordSchema.validate(req.body, { abortEarly: false });
+    } catch (validationError) {
+      return reply.code(400).send({
+        success: false,
+        message: "Validation Failed",
+        errors: formatYupErrors(validationError),
+      });
+    }
+
+    const { current_password, new_password } = req.body;
+
+   
+    const db = req.mongo?.db || req.server?.mongo?.db;
+
+    
+    const userId = req.user.id;
+
+    
+    const user = await db.collection("Users").findOne({
+      _id: new ObjectId(userId),
+    });
+
+    if (!user) {
+      return reply.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // 🔹 5) Check current password
+    const isMatch = await bcrypt.compare(current_password, user.password);
+
+    if (!isMatch) {
+      return reply.status(400).send({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    // 🔹 6) Hash new password
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
+    // 🔹 7) Update password in DB
+    await db.collection("Users").updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { password: hashedPassword } }
+    );
+
+    return reply.status(200).send({
+      success: true,
+      message: "Password updated successfully",
+    });
+
+  } catch (err) {
+    console.error("Change Password Error:", err);
+    return reply.code(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
+
+
 module.exports = {
   register,
   verifyOTP,
@@ -585,5 +669,6 @@ module.exports = {
   forgotPassword,
   verifyResetOTP,
   resetPassword,
-  changeUserStatus
+  changeUserStatus,
+  changePassword
 };
