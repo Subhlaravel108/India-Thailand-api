@@ -133,6 +133,9 @@ const createPackage = async (req, reply) => {
       shortDescription: body.shortDescription.trim(),
       imageUrl:body.imageUrl,
       status:body.status,
+      meta_title:body.meta_title.trim(),
+      meta_description:body.meta_description.trim(),
+      meta_keywords:body.meta_keywords.trim(),
       createdAt: new Date()
     };
 
@@ -204,6 +207,9 @@ const updatePackage = async (req, reply) => {
       shortDescription: body.shortDescription.trim(),
       status:body.status,
       imageUrl:body.imageUrl,
+      meta_title:body.meta_title.trim(),
+      meta_description:body.meta_description.trim(),
+      meta_keywords:body.meta_keywords.trim(),
       updatedAt: new Date(),
     };
 
