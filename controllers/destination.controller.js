@@ -489,3 +489,42 @@ exports.getToursByDestinationSlug = async (req, reply) => {
   }
 };
  
+
+ exports.getAllDestinationByIds=async(req,reply)=>{
+    try{
+        const {ids}=req.body;
+        const db=req.mongo?.db || req.server?.mongo?.db;
+        if(!db){
+            return reply.code(500).send({
+                success:false,
+                message:"Database connection not available",
+            });
+        }
+        const destinationsCol=db.collection("destinations");
+
+
+        const {ObjectId}=require("mongodb");
+
+        const objectIds=ids.map(id=>new ObjectId(id));
+
+        const destinations=await destinationsCol.find({_id:{$in:objectIds}}).project({
+          title: 1,
+          slug: 1,
+          featured_image : 1,
+          short_description: 1,
+          createdAt: 1,
+        }).toArray();
+        return reply.code(200).send({
+            success:true,
+            message:"Destinations fetched successfully",
+            data:destinations,
+        });
+    }catch(err){
+        console.error("Get Destinations By Ids Error:",err);
+        return reply.code(500).send({
+            success:false,
+            message:"Internal Server Error",
+            error:err.message,
+        });
+    }
+}

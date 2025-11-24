@@ -1,4 +1,4 @@
-const {createDestination,updateDestination,getAllDestination,getDestinationDetails,deleteDestination,getFrontAllDestination, getFrontDestinationDetails,getToursByDestinationSlug} = require("../controllers/destination.controller");
+const {createDestination,updateDestination,getAllDestination,getDestinationDetails,deleteDestination,getFrontAllDestination, getFrontDestinationDetails,getToursByDestinationSlug,getAllDestinationByIds} = require("../controllers/destination.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
 async function destinationRoutes(fastify) {
@@ -13,6 +13,7 @@ async function destinationRoutes(fastify) {
      fastify.get("/front/destinations", getFrontAllDestination);
      fastify.get("/front/destination/:slug",getFrontDestinationDetails)
      fastify.get(`/front/by-destination/:slug`,getToursByDestinationSlug)
+     fastify.post("/front/destinations-by-ids", getAllDestinationByIds);
 }
 
 
