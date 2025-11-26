@@ -27,15 +27,14 @@ const getPackages = async (req, reply) => {
 
     const packageCol = db.collection("packages");
 
-    const {
-      page = 1,
-      limit = 10,
-      search = "",
-    } = req.query;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const search = (req.query.search || "").trim();
+    const download = req.query.download === "true"; // string to boolean
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const skip = (page - 1) * limit;
 
-    // ✅ Search filter on title + shortDescription
+    // Search filter
     const query = search
       ? {
           $or: [
@@ -45,24 +44,35 @@ const getPackages = async (req, reply) => {
         }
       : {};
 
+    // Download all packages as JSON
+    if (download) {
+      const allData = await packageCol.find(query).sort({ createdAt: -1 }).toArray();
+      const jsonData = JSON.stringify(allData, null, 2);
+
+      return reply
+        .header("Content-Type", "application/json")
+        .header("Content-Disposition", "attachment; filename=packages.json")
+        .send(jsonData);
+    }
+
+    // Normal pagination
     const total = await packageCol.countDocuments(query);
     const packages = await packageCol
       .find(query)
       .skip(skip)
-      .limit(Number(limit))
+      .limit(limit)
       .sort({ createdAt: -1 })
       .toArray();
 
     return reply.code(200).send({
       success: true,
       message: "Tours Packages fetched successfully",
-      page: Number(page),
-      limit: Number(limit),
+      page,
+      limit,
       total,
-      totalPages: Math.ceil(total / Number(limit)),
+      totalPages: Math.ceil(total / limit),
       data: packages,
     });
-
   } catch (err) {
     console.error("Get Tours package Error:", err);
     return reply.code(500).send({
@@ -72,6 +82,7 @@ const getPackages = async (req, reply) => {
     });
   }
 };
+
 
 // module.exports = { getPackages };
 
@@ -233,43 +244,6 @@ const updatePackage = async (req, reply) => {
   }
 };
 
-// Delete package by slug
-// const deletePackage = async (req, reply) => {
-//   try {
-//     const { slug } = req.params;
-
-//     if (!slug) {
-//       return reply.code(400).send({
-//         success: false,
-//         message: "Slug is required!"
-//       });
-//     }
-
-//     const db = req.server.mongo.db;
-//     const packages = db.collection("packages");
-
-//     const result = await packages.findOneAndDelete({ slug });
-
-//   if (result.deletedCount === 0) {
-//       return reply.code(404).send({
-//         success: false,
-//         message: "Package not found!"
-//       });
-//     }
-
-//     return reply.code(200).send({
-//       success: true,
-//       message: "Package deleted successfully ✅"
-//     });
-
-//   } catch (error) {
-//     return reply.code(500).send({
-//       success: false,
-//       message: "Internal Server Error",
-//       error: error.message
-//     });
-//   }
-// };
 
 
 const deletePackage = async (req, reply) => {

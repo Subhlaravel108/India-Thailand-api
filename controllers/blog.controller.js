@@ -299,6 +299,7 @@ exports.getAllBlogs = async (req, reply) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search ? req.query.search.trim() : "";
+    const download = req.query.download === "true";
 
     // 🔹 Build search filter
     const filter = {};
@@ -309,6 +310,14 @@ exports.getAllBlogs = async (req, reply) => {
         { author: { $regex: search, $options: "i" } },
         { tags: { $regex: search, $options: "i" } },
       ];
+    }
+
+    if(download){
+      const allBlogs = await blogsCol.find(filter).sort({ createdAt: -1 }).limit(limit).toArray();
+      const jsonData = JSON.stringify(allBlogs, null, 2);
+      reply.header("Content-Disposition", "attachment; filename=blogs.json");
+      reply.header("Content-Type", "application/json");
+      return reply.code(200).send(jsonData);
     }
 
     // 🔹 Count total documents (for pagination)

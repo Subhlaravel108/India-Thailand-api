@@ -171,39 +171,44 @@ exports.getAllDestination = async (req, reply) => {
 
     const destinations = db.collection("destinations");
 
-    // 🔹 Query params
+    // Query params
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search ? req.query.search.trim() : "";
+    const download = req.query.download === "true"; // 👈 NEW
 
-    // 🔹 Filter only by title
     const filter = search
-      ? { title: { $regex: search, $options: "i" } } // case-insensitive search
+      ? { title: { $regex: search, $options: "i" } }
       : {};
 
-    // 🔹 Count total documents
+    // If download requested → NO pagination
+    if (download) {
+      const allData = await destinations.find(filter).sort({ createdAt: -1 }).limit(limit).toArray();
+
+      const jsonData = JSON.stringify(allData, null, 2);
+
+      return reply
+        .header("Content-Type", "application/json")
+        .header("Content-Disposition", "attachment; filename=destinations.json")
+        .send(jsonData);
+    }
+
+    // Normal List (Pagination)
     const totalCategories = await destinations.countDocuments(filter);
 
-    // 🔹 Fetch paginated destination
     const categories = await destinations
       .find(filter)
-      .sort({ createdAt: -1 }) // latest first
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .toArray();
 
-    // 🔹 Pagination info
     const totalPages = Math.ceil(totalCategories / limit);
 
     return reply.code(200).send({
       success: true,
       message: "Destination fetched successfully",
-      pagination: {
-        total: totalCategories,
-        page,
-        limit,
-        totalPages,
-      },
+      pagination: { total: totalCategories, page, limit, totalPages },
       data: categories,
     });
 
@@ -216,6 +221,7 @@ exports.getAllDestination = async (req, reply) => {
     });
   }
 };
+
 
 
 exports.getDestinationDetails=async(req,reply)=>{
