@@ -1,3 +1,4 @@
+const { json } = require("stream/consumers");
 const {createDenstinationSchema}=require("../validators/destination.validator");
 const slugify = require("slugify");
 
@@ -204,7 +205,11 @@ exports.getAllDestination = async (req, reply) => {
 
         const totalPages = Math.ceil(totalDocuments / limit);
 
-      const jsonData = JSON.stringify(allData, null, 2);
+       const jsonData = JSON.stringify({
+    success: true,
+    pagination: { total: totalDocuments, page, limit, totalPages },
+    data: allData,
+  }, null, 2);
 
       const fileName =
         type === "homepage"
@@ -217,16 +222,7 @@ exports.getAllDestination = async (req, reply) => {
           "Content-Disposition",
           `attachment; filename=${fileName}`
         )
-        .send({
-      success: true,
-      pagination: {
-        total: totalDocuments,
-        page,
-        limit,
-        totalPages
-      },
-      data: allData,
-    });
+        .send(jsonData);
     }
 
     // NORMAL LIST (Pagination)
