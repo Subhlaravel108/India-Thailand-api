@@ -6,6 +6,10 @@ const createPackageSchema = yup.object({
     .string()
     .required("Short description is required"),
   imageUrl: yup.string().url("Invalid image URL").required("Image is required"),
+  showingOnHomePage: yup
+    .boolean()
+    .required("showingOnHomePage is required")
+    .oneOf([true, false], "showingOnHomePage must be true or false"),
    status: yup.string().oneOf(STATUS, `Status must be one of: ${STATUS.join(", ")}`).required("Status is required"),
    meta_title:yup.string().trim().required("Meta title is required"),
        meta_description:yup.string().trim().required("Meta description is required"),

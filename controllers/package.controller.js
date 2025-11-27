@@ -31,6 +31,7 @@ const getPackages = async (req, reply) => {
     const limit = Number(req.query.limit) || 10;
     const search = (req.query.search || "").trim();
     const download = req.query.download === "true"; // string to boolean
+    const type = req.query.type || "all"; // all | homepage
 
     const skip = (page - 1) * limit;
 
@@ -46,12 +47,33 @@ const getPackages = async (req, reply) => {
 
     // Download all packages as JSON
     if (download) {
-      const allData = await packageCol.find(query).sort({ createdAt: -1 }).toArray();
-      const jsonData = JSON.stringify(allData, null, 2);
+
+      let downloadFilter={...query};
+      if(type==="homepage"){
+        downloadFilter.showingOnHomePage=true;
+      }
+      const totalDocuments=await packageCol.countDocuments(downloadFilter);
+
+      const allData = await packageCol
+      .find(downloadFilter)
+      .sort({ createdAt: -1 })
+      .skip((page-1)* limit)
+      .limit(limit)
+      .toArray();
+
+      const totalPages = Math.ceil(totalDocuments / limit);
+
+      const jsonData = JSON.stringify({
+        success: true,
+        pagination:{total:totalDocuments,page,limit,totalPages},
+        data:allData,
+      },null,2);
+
+      const fileName=type ==="homepage" ?"packages_homepage.json" :"all_packages.json"
 
       return reply
         .header("Content-Type", "application/json")
-        .header("Content-Disposition", "attachment; filename=packages.json")
+        .header("Content-Disposition", `attachment; filename=${fileName}`)
         .send(jsonData);
     }
 
@@ -144,6 +166,7 @@ const createPackage = async (req, reply) => {
       shortDescription: body.shortDescription.trim(),
       imageUrl:body.imageUrl,
       status:body.status,
+      showingOnHomePage:body.showingOnHomePage,
       meta_title:body.meta_title.trim(),
       meta_description:body.meta_description.trim(),
       meta_keywords:body.meta_keywords.trim(),
@@ -218,6 +241,7 @@ const updatePackage = async (req, reply) => {
       shortDescription: body.shortDescription.trim(),
       status:body.status,
       imageUrl:body.imageUrl,
+      showingOnHomePage:body.showingOnHomePage,
       meta_title:body.meta_title.trim(),
       meta_description:body.meta_description.trim(),
       meta_keywords:body.meta_keywords.trim(),
