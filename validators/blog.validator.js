@@ -18,6 +18,10 @@ const createBlogSchema = yup.object({
       return !isNaN(d);
     })
     .nullable(),
+    showingOnHomePage: yup
+  .boolean()
+  .required("showingOnHomePage is required")
+  .oneOf([true, false], "showingOnHomePage must be true or false"),
   status: yup.string().oneOf(BLOG_STATUS, `Status must be one of: ${BLOG_STATUS.join(", ")}`).required("Status is required"),
   tags: yup.mixed().optional(), // accept string (comma) or array
   meta_title: yup.string().trim().optional(),

@@ -91,6 +91,7 @@ if (Array.isArray(body.tags)) {
       content: body.content,
       featuredImage: body.featuredImage,
       publishDate: body.publishDate ? new Date(body.publishDate) : null,
+      showingOnHomePage: body.showingOnHomePage,
       status: body.status,
       tags, // ✅ JSON string form
       meta_title: body.meta_title?.trim() || body.title.trim(),
@@ -221,6 +222,7 @@ exports.updateBlogBySlug = async (req, reply) => {
       content: body.content?.trim(),
       featuredImage: body.featuredImage,
       publishDate: body.publishDate ? new Date(body.publishDate) : null,
+      showingOnHomePage: body.showingOnHomePage,
       status: body.status || "Draft",
       meta_title: body.meta_title?.trim(),
       meta_description: body.meta_description?.trim(),
@@ -293,15 +295,16 @@ exports.getAllBlogs = async (req, reply) => {
       });
     }
 
-    const blogsCol = db.collection("blog"); // plural name rakho consistency ke liye
+    const blogsCol = db.collection("blog");
 
-    // 🔹 Query parameters (defaults)
+    // Query Params
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 9;
     const search = req.query.search ? req.query.search.trim() : "";
     const download = req.query.download === "true";
+    const type = req.query.type || "all";
 
-    // 🔹 Build search filter
+    // Search Filter
     const filter = {};
     if (search) {
       filter.$or = [
@@ -312,26 +315,60 @@ exports.getAllBlogs = async (req, reply) => {
       ];
     }
 
-    if(download){
-      const allBlogs = await blogsCol.find(filter).sort({ createdAt: -1 }).limit(limit).toArray();
-      const jsonData = JSON.stringify(allBlogs, null, 2);
-      reply.header("Content-Disposition", "attachment; filename=blogs.json");
+    // =============== 🔽 DOWNLOAD MODE =============== //
+    if (download) {
+      const downloadFilter = { ...filter };
+
+      if (type === "homepage") {
+        downloadFilter.showingOnHomePage = true;
+      }
+
+      const totalDocuments = await blogsCol.countDocuments(downloadFilter);
+
+      const allBlogs = await blogsCol
+        .find(downloadFilter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .toArray();
+
+      const totalPages = Math.ceil(totalDocuments / limit);
+
+      // JSON Format
+      const jsonData = JSON.stringify(
+        {
+          success: true,
+          pagination: {
+            total: totalDocuments,
+            page,
+            limit,
+            totalPages,
+          },
+          data: allBlogs,
+        },
+        null,
+        2
+      );
+
+      // Correct Filename
+      const fileName = type === "homepage" ? "blogs_homepage.json" : "all_blogs.json";
+
+      reply.header("Content-Disposition", `attachment; filename=${fileName}`);
       reply.header("Content-Type", "application/json");
-      return reply.code(200).send(jsonData);  
+
+      return reply.code(200).send(jsonData);
     }
 
-    // 🔹 Count total documents (for pagination)
+    // =============== 🔽 NORMAL MODE =============== //
     const totalBlogs = await blogsCol.countDocuments(filter);
 
-    // 🔹 Fetch blogs with pagination
     const blogs = await blogsCol
       .find(filter)
-      .sort({ createdAt: -1 }) // latest first
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .toArray();
 
-    // 🔹 Pagination info
     const totalPages = Math.ceil(totalBlogs / limit);
 
     return reply.code(200).send({
