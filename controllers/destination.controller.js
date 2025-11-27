@@ -225,7 +225,7 @@ exports.getAllDestination = async (req, reply) => {
         limit,
         totalPages
       },
-      data: jsonData,
+      data: allData,
     });
     }
 
