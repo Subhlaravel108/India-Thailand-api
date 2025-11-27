@@ -12,6 +12,10 @@ exports.createDenstinationSchema=yup.object().shape({
     meta_keywords:yup.string().trim().required("Meta keywords are required"),
     featured_image:yup.string().url("Image must be a valid url").required("Image is required"), // URL
     gallery:yup.array().of(yup.string().url("Each gallery item must be a valid url")).optional(),
+    showingOnHomePage: yup
+  .boolean()
+  .required("showingOnHomePage is required")
+  .oneOf([true, false], "showingOnHomePage must be true or false"),
     status:yup.string().oneOf(STATUs,`Status must be one of: ${STATUs.join(", ")}`).required("Status is required"),
 });
 

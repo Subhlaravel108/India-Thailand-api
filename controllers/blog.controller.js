@@ -317,7 +317,7 @@ exports.getAllBlogs = async (req, reply) => {
       const jsonData = JSON.stringify(allBlogs, null, 2);
       reply.header("Content-Disposition", "attachment; filename=blogs.json");
       reply.header("Content-Type", "application/json");
-      return reply.code(200).send(jsonData);
+      return reply.code(200).send(jsonData);  
     }
 
     // 🔹 Count total documents (for pagination)

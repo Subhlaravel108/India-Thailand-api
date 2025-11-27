@@ -58,6 +58,7 @@ exports.createDestination=async(req,reply)=>{
             meta_keywords:body.meta_keywords?.trim() || "",
             gallery:body.gallery || [],
             status:body.status,
+            showingOnHomePage: body.showingOnHomePage,
             short_description:body.short_description?.trim() || "",
             createdAt:new Date(),
             updatedAt:new Date(),
@@ -127,6 +128,7 @@ exports.updateDestination=async(req,reply)=>{
             meta_description:body.meta_description?.trim(),
             meta_keywords:body.meta_keywords?.trim(),
             gallery:body.gallery || [],
+            showingOnHomePage: body.showingOnHomePage,
             status:body.status,
             short_description:body.short_description?.trim(),
             updatedAt:new Date(),
@@ -175,25 +177,45 @@ exports.getAllDestination = async (req, reply) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search ? req.query.search.trim() : "";
-    const download = req.query.download === "true"; // 👈 NEW
+    const download = req.query.download === "true";
+    const type = req.query.type || "all"; // homepage | all
 
     const filter = search
       ? { title: { $regex: search, $options: "i" } }
       : {};
 
-    // If download requested → NO pagination
+    // DOWNLOAD SECTION
     if (download) {
-      const allData = await destinations.find(filter).sort({ createdAt: -1 }).limit(limit).toArray();
+      let downloadFilter = { ...filter };
+
+      // Only homepage data
+      if (type === "homepage") {
+        downloadFilter.showingOnHomePage = true;
+      }
+
+      const allData = await destinations
+        .find(downloadFilter)
+        .sort({ createdAt: -1 })
+        .limit(limit) // ✔️ Limit applied
+        .toArray();
 
       const jsonData = JSON.stringify(allData, null, 2);
 
+      const fileName =
+        type === "homepage"
+          ? "destinations_homepage.json"
+          : "all_destinations.json";
+
       return reply
         .header("Content-Type", "application/json")
-        .header("Content-Disposition", "attachment; filename=destinations.json")
+        .header(
+          "Content-Disposition",
+          `attachment; filename=${fileName}`
+        )
         .send(jsonData);
     }
 
-    // Normal List (Pagination)
+    // NORMAL LIST (Pagination)
     const totalCategories = await destinations.countDocuments(filter);
 
     const categories = await destinations
@@ -221,6 +243,7 @@ exports.getAllDestination = async (req, reply) => {
     });
   }
 };
+
 
 
 
@@ -312,7 +335,7 @@ exports.getFrontAllDestination = async (req, reply) => {
 
     // 🔹 Query params
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 9;
     const search = req.query.search ? req.query.search.trim() : "";
 
     // 🔹 Filter: only active + optional search by title

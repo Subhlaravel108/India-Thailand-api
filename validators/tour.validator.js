@@ -27,7 +27,7 @@ const createTourSchema = yup.object({
     .min(1, "At least one gallery image is required")
     .required("Gallery images are required"),
   tour_duration: yup.string().trim().required("Tour duration is required"),
-  price: yup.number().min(0, "Price must be 0 or more").required("Price is required"),
+  price: yup.number().min(0, "Price must be 0 or more").nullable(),
   // nights: yup.number().integer().min(0, "Nights must be 0 or more").required("Nights is required"),
   people: yup.string().required("People is required"),
   countries: yup.string().trim().required("Countries is required"),
