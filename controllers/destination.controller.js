@@ -193,11 +193,16 @@ exports.getAllDestination = async (req, reply) => {
         downloadFilter.showingOnHomePage = true;
       }
 
+      const totalDocuments = await destinations.countDocuments(downloadFilter);
+
       const allData = await destinations
         .find(downloadFilter)
         .sort({ createdAt: -1 })
+        .skip((page - 1) * limit) // ✔️ Skip applied
         .limit(limit) // ✔️ Limit applied
         .toArray();
+
+        const totalPages = Math.ceil(totalDocuments / limit);
 
       const jsonData = JSON.stringify(allData, null, 2);
 
@@ -212,7 +217,16 @@ exports.getAllDestination = async (req, reply) => {
           "Content-Disposition",
           `attachment; filename=${fileName}`
         )
-        .send(jsonData);
+        .send({
+      success: true,
+      pagination: {
+        total: totalDocuments,
+        page,
+        limit,
+        totalPages
+      },
+      data: allData,
+    });
     }
 
     // NORMAL LIST (Pagination)
