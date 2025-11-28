@@ -131,6 +131,7 @@ exports.createTour = async (req, reply) => {
       travelInsuranceIncluded: Boolean(body.travelInsuranceIncluded),
       included: body.included,
       notIncluded: Array.isArray(body.notIncluded) ? body.notIncluded : [],
+      showingOnHomePage: body.showingOnHomePage,
       status: body.status,
       packageId: new ObjectId(packageId),
 
@@ -257,6 +258,7 @@ exports.updateTourBySlug = async (req, reply) => {
       notIncluded: body.notIncluded || [],
       packageId: new ObjectId(body.packageId),
       destinationIds: body.destinationIds.map((id) => new ObjectId(id)),
+      showingOnHomePage: body.showingOnHomePage,
       status: body.status,
       slug: newSlug,
       updatedAt: new Date(),
@@ -328,6 +330,7 @@ exports.getToursBySlug = async (req, reply) => {
     }
 };
 
+
 exports.getTours = async (req, reply) => {
   try {
     const db = req.mongo?.db || req.server?.mongo?.db;
@@ -340,15 +343,14 @@ exports.getTours = async (req, reply) => {
 
     const toursCol = db.collection("tours");
 
-    const {
-      page = 1,
-      limit = 10,
-      search = "",
-    } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const search = req.query.search ? req.query.search.trim() : "";
+    const download = req.query.download === "true";
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const skip = (page - 1) * limit;
 
-    // ✅ Search filter on title + shortDescription
+    // 🔍 Search query
     const query = search
       ? {
           $or: [
@@ -358,24 +360,51 @@ exports.getTours = async (req, reply) => {
         }
       : {};
 
+    // --------------------------------------------------------
+    // 1️⃣ If download=true → Return JSON file for download
+    // --------------------------------------------------------
+    if (download) {
+      const tours = await toursCol
+        .find(query)
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      reply.header("Content-Type", "application/json");
+      reply.header("Content-Disposition", "attachment; filename=tours.json");
+
+      return reply.send(
+        JSON.stringify(
+          {
+            success: true,
+            total: tours.length,
+            data: tours,
+          },
+          null,
+          2
+        )
+      );
+    }
+
+    // --------------------------------------------------------
+    // 2️⃣ Normal tours list API response
+    // --------------------------------------------------------
     const total = await toursCol.countDocuments(query);
     const tours = await toursCol
       .find(query)
       .skip(skip)
-      .limit(Number(limit))
+      .limit(limit)
       .sort({ createdAt: -1 })
       .toArray();
 
     return reply.code(200).send({
       success: true,
       message: "Tours fetched successfully",
-      page: Number(page),
-      limit: Number(limit),
+      page,
+      limit,
       total,
-      totalPages: Math.ceil(total / Number(limit)),
+      totalPages: Math.ceil(total / limit),
       data: tours,
     });
-
   } catch (err) {
     console.error("Get Tours Error:", err);
     return reply.code(500).send({

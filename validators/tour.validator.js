@@ -48,6 +48,10 @@ const createTourSchema = yup.object({
     .of(yup.string().trim().required("Each destinationId is required"))
     .min(1, "At least one destinationId is required")
     .required("DestinationIds field is required"),
+    showingOnHomePage: yup
+       .boolean()
+       .required("showingOnHomePage is required")
+       .oneOf([true, false], "showingOnHomePage must be true or false"),
   status:yup.string().oneOf(STATUS,`Status must be one of: ${STATUS.join(", ")}`).required("Status is required")
 });
 
