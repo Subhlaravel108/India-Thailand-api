@@ -350,7 +350,7 @@ exports.getTours = async (req, reply) => {
 
     const skip = (page - 1) * limit;
 
-    // 🔍 Search query
+    // 🔍 Search filter
     const query = search
       ? {
           $or: [
@@ -360,8 +360,12 @@ exports.getTours = async (req, reply) => {
         }
       : {};
 
+    // Count total matching tours
+    const total = await toursCol.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
     // --------------------------------------------------------
-    // 1️⃣ If download=true → Return JSON file for download
+    // 1️⃣ If download=true → Send JSON file with pagination
     // --------------------------------------------------------
     if (download) {
       const tours = await toursCol
@@ -376,7 +380,13 @@ exports.getTours = async (req, reply) => {
         JSON.stringify(
           {
             success: true,
-            total: tours.length,
+            message: "Tours JSON downloaded",
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages,
+            },
             data: tours,
           },
           null,
@@ -386,9 +396,8 @@ exports.getTours = async (req, reply) => {
     }
 
     // --------------------------------------------------------
-    // 2️⃣ Normal tours list API response
+    // 2️⃣ Normal paginated API response
     // --------------------------------------------------------
-    const total = await toursCol.countDocuments(query);
     const tours = await toursCol
       .find(query)
       .skip(skip)
@@ -402,9 +411,10 @@ exports.getTours = async (req, reply) => {
       page,
       limit,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
       data: tours,
     });
+
   } catch (err) {
     console.error("Get Tours Error:", err);
     return reply.code(500).send({
@@ -414,6 +424,7 @@ exports.getTours = async (req, reply) => {
     });
   }
 };
+
 
 
 exports.deleteTourById=async(req,reply)=>{
