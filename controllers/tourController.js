@@ -425,7 +425,7 @@ exports.getTours = async (req, reply) => {
   }
 };
 
-
+ 
 
 exports.deleteTourById=async(req,reply)=>{
     try{
