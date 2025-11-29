@@ -131,7 +131,7 @@ exports.createTour = async (req, reply) => {
       travelInsuranceIncluded: Boolean(body.travelInsuranceIncluded),
       included: body.included,
       notIncluded: Array.isArray(body.notIncluded) ? body.notIncluded : [],
-      showingOnHomePage: body.showingOnHomePage,
+     
       status: body.status,
       packageId: new ObjectId(packageId),
 
@@ -258,7 +258,7 @@ exports.updateTourBySlug = async (req, reply) => {
       notIncluded: body.notIncluded || [],
       packageId: new ObjectId(body.packageId),
       destinationIds: body.destinationIds.map((id) => new ObjectId(id)),
-      showingOnHomePage: body.showingOnHomePage,
+      
       status: body.status,
       slug: newSlug,
       updatedAt: new Date(),
