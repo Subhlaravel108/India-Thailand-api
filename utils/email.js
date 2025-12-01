@@ -5,33 +5,69 @@ const emailFooter = fs.readFileSync(path.join(__dirname, '../templates/footer.ht
 const nodemailer = require('nodemailer');
 
 // Create transporter for sending emails
-const createTransporter = () => {
-  // Check if custom SMTP settings are provided
-  if (process.env.EMAIL_HOST) {
-    console.log('Using custom SMTP:', {
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      user: process.env.EMAIL_USER
-    });
+// const createTransporter = () => {
+//   // Check if custom SMTP settings are provided
+//   if (process.env.EMAIL_HOST) {
+//     console.log('Using custom SMTP:', {
+//       host: process.env.EMAIL_HOST,
+//       port: process.env.EMAIL_PORT,
+//       user: process.env.EMAIL_USER
+//     });
 
 
     
+//     return nodemailer.createTransport({
+//       host: process.env.EMAIL_HOST,
+//       port: parseInt(process.env.EMAIL_PORT) || 587,
+//       // secure: parseInt(process.env.EMAIL_PORT) === 465, // true for 465, false for other ports
+//       secure:port===465,
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_APP_PASSWORD
+//       },
+//       // tls: {
+//       //   rejectUnauthorized: false // Accept self-signed certificates
+//       // }
+//     });
+//   } else {
+//     // Default to Gmail
+//     console.log('Using Gmail service');
+//     return nodemailer.createTransport({
+//       service: 'gmail',
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_APP_PASSWORD
+//       }
+//     });
+//   }
+// };
+
+const createTransporter = () => {
+
+  const port = parseInt(process.env.EMAIL_PORT) || 587;
+  const secure = port === 465;  // true only for 465
+
+  if (process.env.EMAIL_HOST) {
+    console.log('Using custom SMTP:', {
+      host: process.env.EMAIL_HOST,
+      port: port,
+      user: process.env.EMAIL_USER,
+      secure: secure
+    });
+
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT) || 587,
-      // secure: parseInt(process.env.EMAIL_PORT) === 465, // true for 465, false for other ports
-      secure:port===465,
+      port: port,
+      secure: secure,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_APP_PASSWORD
-      },
-      // tls: {
-      //   rejectUnauthorized: false // Accept self-signed certificates
-      // }
+      }
     });
+
   } else {
-    // Default to Gmail
     console.log('Using Gmail service');
+
     return nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -41,6 +77,7 @@ const createTransporter = () => {
     });
   }
 };
+
 
 // Generate OTP
 const generateOTP = () => {
