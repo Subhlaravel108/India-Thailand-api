@@ -82,11 +82,9 @@ exports.getAllFeedback = async (req, reply) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search ? req.query.search.trim() : "";
-    const download = req.query.download === "true";
+    const download = req.query.download === 'true';
 
-    // ----------- FILTER --------------
     const filter = {};
-
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -95,37 +93,35 @@ exports.getAllFeedback = async (req, reply) => {
       ];
     }
 
-    // =============== DOWNLOAD MODE ===============
+    // 🚀 DOWNLOAD MODE — only approved, no pagination
     if (download) {
       const downloadFilter = {
         ...filter,
-        status: "approved", // ONLY APPROVED
+        status: "approved",
       };
 
-      const totalFeedbacks = await feedbackCol.countDocuments(downloadFilter);
-      const allFeedbacks = await feedbackCol
+      const approvedFeedbacks = await feedbackCol
         .find(downloadFilter)
-        .sort({ createdAt: -1 })
-        .limit(2)  // ⭐ Only 2 approved feedbacks
+        .sort({ createdAt: -1 })   // no skip/limit here ❌
         .toArray();
 
-      const jsonData = JSON.stringify({
+      const jsonData = JSON.stringify(
+        {
           success: true,
-          total: totalFeedbacks,
-          data: allFeedbacks,
-        }, null,2);
+          total: approvedFeedbacks.length,
+          data: approvedFeedbacks,
+        },
+        null,
+        2
+      );
 
       return reply
         .header("Content-Type", "application/json")
-        .header(
-          "Content-Disposition",
-          'attachment; filename="approved_feedbacks.json"'
-        )
-        .code(200)
+        .header("Content-Disposition", "attachment; filename=approved_feedbacks.json")
         .send(jsonData);
     }
 
-    // =============== NORMAL PAGINATION ===============
+    // NORMAL RESPONSE — with pagination
     const totalFeedbacks = await feedbackCol.countDocuments(filter);
 
     const feedbacks = await feedbackCol
@@ -148,6 +144,7 @@ exports.getAllFeedback = async (req, reply) => {
       },
       data: feedbacks,
     });
+
   } catch (err) {
     console.error("Get All Feedbacks Error:", err);
     return reply.code(500).send({
@@ -157,6 +154,7 @@ exports.getAllFeedback = async (req, reply) => {
     });
   }
 };
+
 
 
 exports.ChangeFeedbackStatus = async (req, reply) => {
