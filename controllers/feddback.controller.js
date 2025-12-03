@@ -82,7 +82,7 @@ exports.getAllFeedback = async (req, reply) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search ? req.query.search.trim() : "";
-    const download = req.query.download === 'true';
+    const download = req.query.download === "true";
 
     const filter = {};
     if (search) {
@@ -105,15 +105,11 @@ exports.getAllFeedback = async (req, reply) => {
         .sort({ createdAt: -1 })   // no skip/limit here ❌
         .toArray();
 
-      const jsonData = JSON.stringify(
-        {
+      const jsonData = JSON.stringify({
           success: true,
           total: approvedFeedbacks.length,
           data: approvedFeedbacks,
-        },
-        null,
-        2
-      );
+        },null,2);
 
       return reply
         .header("Content-Type", "application/json")
