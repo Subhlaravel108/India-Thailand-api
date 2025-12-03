@@ -109,15 +109,11 @@ exports.getAllFeedback = async (req, reply) => {
         .limit(2)  // ⭐ Only 2 approved feedbacks
         .toArray();
 
-      const jsonData = JSON.stringify(
-        {
+      const jsonData = JSON.stringify({
           success: true,
           total: totalFeedbacks,
           data: allFeedbacks,
-        },
-        null,
-        2
-      );
+        }, null,2);
 
       return reply
         .header("Content-Type", "application/json")
