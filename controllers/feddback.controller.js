@@ -1,4 +1,4 @@
-const { status } = require("nprogress");
+// const { status } = require("nprogress");
 const { createFeedbackSchema } = require("../validators/feedback.validator");
 const { ObjectId } = require('@fastify/mongodb');
 
@@ -110,6 +110,8 @@ exports.getAllFeedback = async (req, reply) => {
           total: approvedFeedbacks.length,
           data: approvedFeedbacks,
         },null,2);
+
+        console.log("json=",jsonData)
 
       return reply
         .header("Content-Type", "application/json")
