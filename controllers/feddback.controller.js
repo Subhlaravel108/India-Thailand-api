@@ -1,3 +1,4 @@
+const { status } = require("nprogress");
 const { createFeedbackSchema } = require("../validators/feedback.validator");
 const { ObjectId } = require('@fastify/mongodb');
 
@@ -66,23 +67,26 @@ exports.createFeedback = async (req, reply) => {
 };
 
 
-exports.getAllFeedback=async(req,reply)=>{
-    try{
-        const db=req.mongo?.db || req.server.mongo.db
-        if(!db){
-          return reply.code(500).send({
-            success:false,
-            message:"Database connection not available"
-          })
-        }
+exports.getAllFeedback = async (req, reply) => {
+  try {
+    const db = req.mongo?.db || req.server.mongo.db;
+    if (!db) {
+      return reply.code(500).send({
+        success: false,
+        message: "Database connection not available",
+      });
+    }
 
-        const feedbackCol=await db.collection("feedbacks")
-        const page=parseInt(req.query.page) || 1
-        const limit=parseInt(req.query.limit) || 10
-        const search=req.query.search ? req.query.search.trim() : ""
+    const feedbackCol = db.collection("feedbacks");
 
-       
-       const filter = {};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search ? req.query.search.trim() : "";
+    const download = req.query.download === "true";
+
+    // ----------- FILTER --------------
+    const filter = {};
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -90,13 +94,54 @@ exports.getAllFeedback=async(req,reply)=>{
         { email: { $regex: search, $options: "i" } },
       ];
     }
-    const totalFeedbacks= await feedbackCol.countDocuments(filter)
 
-    const feedbacks=  await feedbackCol.find(filter).sort({createdAt: -1}).skip((page-1) * limit).limit(limit).toArray()
+    // =============== DOWNLOAD MODE ===============
+    if (download) {
+      const downloadFilter = {
+        ...filter,
+        status: "approved", // ONLY APPROVED
+      };
 
-    const totalPages= Math.ceil(totalFeedbacks/limit)
+      const totalFeedbacks = await feedbackCol.countDocuments(downloadFilter);
+      const allFeedbacks = await feedbackCol
+        .find(downloadFilter)
+        .sort({ createdAt: -1 })
+        .limit(2)  // ⭐ Only 2 approved feedbacks
+        .toArray();
 
-     return reply.code(200).send({
+      const jsonData = JSON.stringify(
+        {
+          success: true,
+          total: totalFeedbacks,
+          data: allFeedbacks,
+        },
+        null,
+        2
+      );
+
+      return reply
+        .header("Content-Type", "application/json")
+        .header(
+          "Content-Disposition",
+          'attachment; filename="approved_feedbacks.json"'
+        )
+        .code(200)
+        .send(jsonData);
+    }
+
+    // =============== NORMAL PAGINATION ===============
+    const totalFeedbacks = await feedbackCol.countDocuments(filter);
+
+    const feedbacks = await feedbackCol
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .toArray();
+
+    const totalPages = Math.ceil(totalFeedbacks / limit);
+
+    return reply.code(200).send({
       success: true,
       message: "Feedbacks fetched successfully",
       pagination: {
