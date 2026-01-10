@@ -12,7 +12,7 @@ fastify.register(require('@fastify/static'), {
 fastify.register(require('@fastify/cors'), {
   origin: '*',
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 
@@ -52,6 +52,7 @@ fastify.register(require("./routes/newsletter.routes"), { prefix: "/api" });
 fastify.register(require("./routes/service.route"),{prefix:'/api'})
 fastify.register(require("./routes/dashboard.routes"),{prefix:"/api"})
 fastify.register(require("./routes/feedback.route"),{prefix:"/api"})
+fastify.register(require("./routes/allInquiries.route"),{prefix:"/api"})
 // ✅ Use async start function for stability on Render
 const start = async () => {
   try {

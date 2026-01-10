@@ -29,6 +29,9 @@ exports.Booking = async (req, reply) => {
       travelers: Number(body.travelers),
       travelDate: body.travelDate.trim(),
       message: body.message?.trim() || "",
+      source: "booking",
+      status:"New",
+      assignedCC: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

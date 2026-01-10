@@ -1,10 +1,13 @@
 const authController = require('../controllers/auth.controller');
 const authMiddleware = require("../middleware/auth.middleware");
+const  adminOnly  = require("../middleware/adminOnly");
 const authRoutes = async (fastify, options) => {
  
 
   // Register
   fastify.post('/register', authController.register);
+
+  fastify.post("/admin/create-cc-user", { preHandler: [authMiddleware, adminOnly]}, authController.createCCUser);
   
   // Verify OTP
   fastify.post('/verify-otp', authController.verifyOTP);

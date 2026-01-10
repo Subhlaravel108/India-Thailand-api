@@ -48,7 +48,7 @@ const register = async (request, reply) => {
         message: 'User already exists with this email',
         errors: {
           email: 'This email is already registered'
-        }
+        } 
       });
     }
 
@@ -105,6 +105,74 @@ const register = async (request, reply) => {
     });
   }
 };
+
+
+const createCCUser= async (request, reply) => {
+  try {
+    const body = await parseRequest(request);
+    const { name, email, password, phone } = body;
+
+    // Validate input
+    const validation = validateRegister({ name, email, password, phone });
+    if (!validation.isValid) {
+      return reply.status(400).send({
+        success: false,
+        message: 'Validation failed',
+        errors: validation.errors
+      });
+    }
+
+    // Get MongoDB from fastify instance
+    const db = request.server.mongo.db;
+    // Check if user exists
+    const existingUser = await db.collection('Users').findOne({ email });
+    if (existingUser) {
+      return reply.status(400).send({
+        success: false,
+        message: 'User already exists with this email',
+        errors: {
+          email: 'This email is already registered'
+        } 
+      });
+    }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create user
+    const user = {
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role: 'cc_user',
+      isVerified: true,
+      status:request.body.status || "Active",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await db.collection('Users').insertOne(user);
+    return reply.status(201).send({
+      success: true,
+      message: 'CC User created successfully.',
+      data: {
+        id: result.insertedId,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isVerified: user.isVerified,
+        createdBy: user.createdBy,
+        status:user.status
+      }
+    });
+  } catch (error) {
+    reply.status(500).send({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
 
 // Verify OTP
 const verifyOTP = async (request, reply) => {
@@ -663,6 +731,7 @@ const changePassword = async (req, reply) => {
 
 module.exports = {
   register,
+  createCCUser,
   verifyOTP,
   resendOTP,
   login,

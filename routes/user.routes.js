@@ -1,8 +1,9 @@
+const adminOnly = require("../middleware/adminOnly");
 const authMiddleware = require("../middleware/auth.middleware");
 
 const userRoutes = async (fastify, options) => {
   // ✅ Get all users (except admin) + search + pagination (Protected route)
-  fastify.get("/users", { preHandler: authMiddleware }, async (request, reply) => {
+  fastify.get("/admin/cc-users", { preHandler: [authMiddleware,adminOnly] }, async (request, reply) => {
     try {
       const db = request.server.mongo.db;
       const usersCollection = db.collection("Users");
@@ -16,7 +17,7 @@ const userRoutes = async (fastify, options) => {
       const skip = (pageNumber - 1) * limitNumber;
 
       // Base filter (exclude admin)
-      const filter = { role: { $ne: "admin" } };
+      const filter = { role: "cc_user" };
 
       // Optional search
       if (search) {

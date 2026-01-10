@@ -31,6 +31,9 @@ exports.submitService = async (req, reply) => {
     const saved = {
       serviceType,
       data: { ...body },
+      source: "service",
+      status:"New",
+      assignedCC: null,
     //   ip: req.ip || req.raw?.socket?.remoteAddress || null,
       createdAt: new Date(),
       updatedAt: new Date(),
