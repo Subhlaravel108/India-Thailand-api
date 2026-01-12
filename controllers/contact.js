@@ -107,16 +107,6 @@ exports.getAllContacts = async (req, reply) => {
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
-        {lastname:{ $regex: search, $options: "i" }},
-         {
-      $expr: {
-        $regexMatch: {
-          input: { $concat: ["$name"," ","$lastname"] },
-          regex: search,
-          options: "i"
-        }
-      }
-    },
         { number: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
       ];
