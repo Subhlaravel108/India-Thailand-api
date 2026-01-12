@@ -1,4 +1,4 @@
-const { ObjectId } = require("@fastify/mongodb");
+const { ObjectId } = require("mongodb");
 
 // const AllInquiries = async (req, reply) => {
 //   try {
@@ -428,4 +428,200 @@ const updateInquiryStatus = async (req, reply) => {
 };
 
 
-module.exports = { AllInquiries,assignInquiry,updateInquiryStatus };
+// POST /cc/send-message
+
+const sendCcMessage = async (req, reply) => {
+  try {
+    const { inquiry_id, source, message } = req.body;
+    const ccUserId = req.user.id;
+    // console.log("inquiry id",inquiry_id)
+    // console.log("source",source)
+    // console.log("message",message)
+    // console.log("cc id",ccUserId)
+
+    if (!message || !message.trim()) {
+      return reply.code(400).send({
+        success: false,
+        message: "Message is required",
+      });
+    }
+
+    const db = req.server.mongo.db;
+
+    const collectionMap = {
+      booking: "bookings",
+      contact: "contact",
+      service: "services",
+    };
+
+    const inquiryCol = db.collection(collectionMap[source]);
+
+    // 🔒 Check inquiry assigned to this CC
+    const inquiry = await inquiryCol.findOne({
+      _id: new ObjectId(inquiry_id),
+      assignedCC: new ObjectId(ccUserId),
+    });
+
+    // console.log("inquiry=",inquiry)
+    if (!inquiry) {
+      return reply.code(403).send({
+        success: false,
+        message: "You can message only assigned inquiries",
+      });
+    }
+
+    if(inquiry.status==="Closed"){
+        return reply.code(400).send({
+          success:false,
+          message: "Inquiry is closed. You cannot send messages."
+        })
+    }
+
+    // ✅ Save message
+    await db.collection("messages").insertOne({
+      inquiryId: new ObjectId(inquiry_id),
+      assignedCC:new ObjectId(ccUserId),
+      source: inquiry.source,
+      message: message.trim(),
+      createdAt: new Date(),
+    });
+
+    return reply.send({
+      success: true,
+      message: "Message sent successfully",
+    });
+
+  } catch (err) {
+    console.error("Send CC Message Error:", err);
+    return reply.code(500).send({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+
+
+
+ const getInquiryMessages = async (req, reply) => {
+  try {
+    const { id } = req.params;
+    const { source } = req.query;
+    const user = req.user; // JWT se
+    console.log("user=",user)
+
+    if (!ObjectId.isValid(id)) {
+      return reply.code(400).send({
+        success: false,
+        message: "Invalid inquiry ID",
+      });
+    }
+
+    if (!["booking", "contact", "service"].includes(source)) {
+      return reply.code(400).send({
+        success: false,
+        message: "Invalid source",
+      });
+    }
+
+    const db = req.mongo?.db || req.server?.mongo?.db;
+
+    // 🔐 CC-user ke liye authorization
+    if (user.role === "cc_user") {
+      const collectionMap = {
+        booking: "bookings",
+        contact: "contact",
+        service: "services",
+      };
+
+      const inquiry = await db
+        .collection(collectionMap[source])
+        .findOne({
+          _id: new ObjectId(id),
+          assignedCC: new ObjectId(user.id),
+        });
+
+      if (!inquiry) {
+        return reply.code(403).send({
+          success: false,
+          message: "Not authorized to view this inquiry",
+        });
+      }
+    }
+
+    const messages = await db
+      .collection("messages")
+      .find({
+        inquiryId: new ObjectId(id),
+        source,
+      })
+      .sort({ createdAt: 1 })
+      .toArray();
+
+    return reply.send({
+      success: true,
+      total: messages.length,
+      data: messages,
+    });
+
+  } catch (err) {
+    console.error("Get Inquiry Messages Error:", err);
+    return reply.code(500).send({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+
+
+
+//  const getInquiryMessagesForAdmin = async (req, reply) => {
+//   try {
+//     const { id } = req.params;         // inquiryId
+//     const { source } = req.query;      // booking / contact / service
+
+//     if (!ObjectId.isValid(id)) {
+//       return reply.code(400).send({
+//         success: false,
+//         message: "Invalid inquiry ID",
+//       });
+//     }
+
+//     if (!["booking", "contact", "services"].includes(source)) {
+//       return reply.code(400).send({
+//         success: false,
+//         message: "Invalid source type",
+//       });
+//     }
+
+//     const db = req.mongo?.db || req.server?.mongo?.db;
+//     const messageCol = db.collection("inquiry_messages");
+
+//     const messages = await messageCol
+//       .find({
+//         inquiryId: new ObjectId(id),
+//         source,
+//       })
+//       .sort({ createdAt: 1 }) // oldest → newest
+//       .toArray();
+
+//     return reply.send({
+//       success: true,
+//       message: "Message history fetched successfully",
+//       totalMessages: messages.length,
+//       data: messages,
+//     });
+
+//   } catch (error) {
+//     console.error("Admin Message History Error:", error);
+//     return reply.code(500).send({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
+module.exports = { AllInquiries,assignInquiry,updateInquiryStatus,sendCcMessage,getInquiryMessages };
