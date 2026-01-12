@@ -351,6 +351,13 @@ const login = async (request, reply) => {
       });
     }
 
+    if(user.status==="Deactive"){
+        return reply.code(401).send({
+            success:false,
+            message:"Your account is deactivated. Please contact admin."
+        })
+    }
+
     // ✅ Create JWT Token
     const token = request.server.jwt.sign(
       {
