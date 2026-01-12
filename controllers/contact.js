@@ -111,7 +111,7 @@ exports.getAllContacts = async (req, reply) => {
          {
       $expr: {
         $regexMatch: {
-          input: { $concat: ["$name", " ", "$lastname"] },
+          input: { $concat: ["$name"," ","$lastname"] },
           regex: search,
           options: "i"
         }
