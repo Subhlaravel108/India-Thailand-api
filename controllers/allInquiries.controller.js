@@ -136,81 +136,77 @@ const AllInquiries = async (req, reply) => {
     }
 
     const bookingCol = db.collection("bookings");
-    const contactCol = db.collection("contact"); 
-    const serviceCol = db.collection("services"); 
+    const contactCol = db.collection("contact");
+    const serviceCol = db.collection("services");
 
     // Query params
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
     const search = req.query.search ? req.query.search.trim() : "";
+    const serviceType = req.query.serviceType
+      ? req.query.serviceType.trim()
+      : null;
 
-    // Build filters for each collection
-    const bookingFilter = search
-      ? { $or: [
+    const skip = (page - 1) * limit;
+
+    /* ---------------- BOOKING FILTER ---------------- */
+    const bookingFilter = {
+      ...(search && {
+        $or: [
           { fullName: { $regex: search, $options: "i" } },
           { email: { $regex: search, $options: "i" } },
           { phone: { $regex: search, $options: "i" } },
-          {packageType:   { $regex: search, $options: "i"}}
-        ]}
-      : {};
+          { packageType: { $regex: search, $options: "i" } }
+        ]
+      }),
+      ...(serviceType && { packageType: serviceType })
+    };
 
-    const contactFilter = search
-      ? { $or: [
+    /* ---------------- CONTACT FILTER ---------------- */
+    const contactFilter = {
+      ...(search && {
+        $or: [
           { name: { $regex: search, $options: "i" } },
           { email: { $regex: search, $options: "i" } },
           { phone: { $regex: search, $options: "i" } },
-          {travelInterest: { $regex: search, $options: "i" }}
-        ]}
-      : {};
+          { travelInterest: { $regex: search, $options: "i" } }
+        ]
+      }),
+      ...(serviceType && { travelInterest: serviceType })
+    };
 
-    const serviceFilter = search
-      ? { $or: [
+    /* ---------------- SERVICE FILTER ---------------- */
+    const serviceFilter = {
+      ...(search && {
+        $or: [
           { "data.name": { $regex: search, $options: "i" } },
           { "data.email": { $regex: search, $options: "i" } },
-          { "data.phone": { $regex: search, $options: "i" } },
-          { serviceType : {$regex: search, $options: "i" }}
-        ]}
-      : {};
+          { "data.phone": { $regex: search, $options: "i" } }
+        ]
+      }),
+      ...(serviceType && { serviceType })
+    };
 
-    // Count total documents for pagination
-    const totalBookings = await bookingCol.countDocuments(bookingFilter);
-    const totalContacts = await contactCol.countDocuments(contactFilter);
-    const totalServices = await serviceCol.countDocuments(serviceFilter);
-    const totalInquiries = totalBookings + totalContacts + totalServices;
+    /* -------- FETCH MORE DATA TO PAGINATE SAFELY ------ */
+    const FETCH_LIMIT = page * limit;
 
-    // Calculate skip & limit proportionally (rough estimate)
-    const skip = (page - 1) * limit;
+    const [bookings, contacts, services] = await Promise.all([
+      bookingCol.find(bookingFilter).sort({ createdAt: -1 }).limit(FETCH_LIMIT).toArray(),
+      contactCol.find(contactFilter).sort({ createdAt: -1 }).limit(FETCH_LIMIT).toArray(),
+      serviceCol.find(serviceFilter).sort({ createdAt: -1 }).limit(FETCH_LIMIT).toArray()
+    ]);
 
-    // Fetch data from each collection
-    const bookings = await bookingCol.find(bookingFilter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray();
-
-    const contacts = await contactCol.find(contactFilter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray();
-
-    const services = await serviceCol.find(serviceFilter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .toArray();
-
-    // Normalize each collection
+    /* ---------------- NORMALIZE DATA ---------------- */
     const formattedBookings = bookings.map(b => ({
       _id: b._id,
       name: b.fullName,
       email: b.email,
       phone: b.phone,
-      message: b.message,
+      message: b.message || null,
       source: "booking",
       type: b.packageType,
-      status: b.status,
-      assignedCC: b.assignedCC,
+      status: b.status || "new",
+      assignedCC: b.assignedCC || null,
       createdAt: b.createdAt,
       updatedAt: b.updatedAt
     }));
@@ -220,52 +216,58 @@ const AllInquiries = async (req, reply) => {
       name: c.name,
       email: c.email,
       phone: c.phone,
-      message: c.message,
+      message: c.message || null,
       source: "contact",
       type: c.travelInterest || null,
-      status: c.status,
-      assignedCC: c.assignedCC,
+      status: c.status || "new",
+      assignedCC: c.assignedCC || null,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt
     }));
 
     const formattedServices = services.map(s => ({
       _id: s._id,
-      name: s.data.name,
-      email: s.data.email,
-      phone: s.data.phone,
-      message: s.data.message,
+      name: s.data?.name,
+      email: s.data?.email,
+      phone: s.data?.phone,
+      message: s.data?.message || null,
       source: "service",
       type: s.serviceType,
-      status: s.status,
-      assignedCC: s.assignedCC,
+      status: s.status || "new",
+      assignedCC: s.assignedCC || null,
       createdAt: s.createdAt,
       updatedAt: s.updatedAt
     }));
 
-    // Merge all
-    let allInquiries = [...formattedBookings, ...formattedContacts, ...formattedServices];
+    /* ---------------- MERGE & SORT ---------------- */
+    const allInquiries = [
+      ...formattedBookings,
+      ...formattedContacts,
+      ...formattedServices
+    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    // Sort by createdAt descending
-    allInquiries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    /* ---------------- FINAL PAGINATION ---------------- */
+    const paginatedData = allInquiries.slice(skip, skip + limit);
 
-    // Apply final pagination
-    const paginatedInquiries = allInquiries.slice(0, limit); // already fetched limited per collection
+    const total =
+      (await bookingCol.countDocuments(bookingFilter)) +
+      (await contactCol.countDocuments(contactFilter)) +
+      (await serviceCol.countDocuments(serviceFilter));
 
     return reply.code(200).send({
       success: true,
       message: "Inquiries fetched successfully",
       pagination: {
-        total: totalInquiries,
+        total,
         page,
         limit,
-        totalPages: Math.ceil(totalInquiries / limit)
+        totalPages: Math.ceil(total / limit)
       },
-      data: paginatedInquiries
+      data: paginatedData
     });
 
   } catch (err) {
-    console.error("Get All Inquiries Error:", err);
+    console.error("AllInquiries Error:", err);
     return reply.code(500).send({
       success: false,
       message: "Internal Server Error",
@@ -273,6 +275,8 @@ const AllInquiries = async (req, reply) => {
     });
   }
 };
+
+// module.exports = AllInquiries;
 
 // module.exports = { AllInquiries };
 
