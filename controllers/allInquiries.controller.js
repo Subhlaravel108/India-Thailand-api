@@ -159,7 +159,7 @@ const AllInquiries = async (req, reply) => {
           { packageType: { $regex: search, $options: "i" } }
         ]
       }),
-      ...(serviceType && { packageType: serviceType })
+      ...(serviceType && { source: serviceType })
     };
 
     /* ---------------- CONTACT FILTER ---------------- */
@@ -172,7 +172,7 @@ const AllInquiries = async (req, reply) => {
           { travelInterest: { $regex: search, $options: "i" } }
         ]
       }),
-      ...(serviceType && { travelInterest: serviceType })
+      ...(serviceType && { source: serviceType })
     };
 
     /* ---------------- SERVICE FILTER ---------------- */
@@ -185,7 +185,7 @@ const AllInquiries = async (req, reply) => {
           {serviceType: { $regex: search, $options: "i" } }
         ]
       }),
-      ...(serviceType && { serviceType })
+      ...(serviceType && { source:serviceType })
     };
 
     /* -------- FETCH MORE DATA TO PAGINATE SAFELY ------ */
