@@ -168,7 +168,7 @@ const AllInquiries = async (req, reply) => {
           { "data.name": { $regex: search, $options: "i" } },
           { "data.email": { $regex: search, $options: "i" } },
           { "data.phone": { $regex: search, $options: "i" } },
-          { " data.serviceType" : {$regex: search, $options: "i" }}
+          { serviceType : {$regex: search, $options: "i" }}
         ]}
       : {};
 
