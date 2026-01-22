@@ -6,6 +6,15 @@ const name = yup.string().trim().required("Name is required");
 const email = yup.string().trim().lowercase().email("Please provide a valid email address").required("Email is required");
 const phone = yup.string().trim().required("Phone is required");
 const message = yup.string().trim().required("Message is required");
+const SERVICE_TYPE_MAP = {
+  "flight booking": "flight",
+  "hotel reservation": "hotel",
+  "visa service": "visa",
+  "car rental": "car",
+  "travel insurance": "insurance",
+  "custom tours": "custom"
+};
+
 
 // Build schema per serviceType
 const schemas = {
@@ -90,13 +99,26 @@ function formatYupErrors(yupError) {
 }
 
 async function validateServicePayload(serviceType, payload) {
-  const key = (serviceType || "").toLowerCase();
-  const schema = schemas[key];
-  if (!schema) {
+  const normalizedType = (serviceType || "").toLowerCase().trim();
+
+  const schemaKey = SERVICE_TYPE_MAP[normalizedType];
+
+  if (!schemaKey || !schemas[schemaKey]) {
     throw new Error("Invalid serviceType");
   }
-  return schema.validate(payload, { abortEarly: false });
+
+  // 🔥 IMPORTANT: serviceType ko frontend wali value hi rehne do
+  const validatedData = await schemas[schemaKey].validate(
+    {
+      ...payload,
+      serviceType // "Flight Booking" yahin store hoga
+    },
+    { abortEarly: false }
+  );
+
+  return validatedData;
 }
+
 
 module.exports = {
   validateServicePayload,
