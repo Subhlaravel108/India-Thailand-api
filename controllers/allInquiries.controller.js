@@ -150,6 +150,7 @@ const AllInquiries = async (req, reply) => {
           { fullName: { $regex: search, $options: "i" } },
           { email: { $regex: search, $options: "i" } },
           { phone: { $regex: search, $options: "i" } },
+          {packageType:   { $regex: search, $options: "i"}}
         ]}
       : {};
 
@@ -158,6 +159,7 @@ const AllInquiries = async (req, reply) => {
           { name: { $regex: search, $options: "i" } },
           { email: { $regex: search, $options: "i" } },
           { phone: { $regex: search, $options: "i" } },
+          {travelInterest: { $regex: search, $options: "i" }}
         ]}
       : {};
 
@@ -166,6 +168,7 @@ const AllInquiries = async (req, reply) => {
           { "data.name": { $regex: search, $options: "i" } },
           { "data.email": { $regex: search, $options: "i" } },
           { "data.phone": { $regex: search, $options: "i" } },
+          { " data.serviceType" : {$regex: search, $options: "i" }}
         ]}
       : {};
 
