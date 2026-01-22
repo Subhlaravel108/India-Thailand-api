@@ -181,7 +181,8 @@ const AllInquiries = async (req, reply) => {
         $or: [
           { "data.name": { $regex: search, $options: "i" } },
           { "data.email": { $regex: search, $options: "i" } },
-          { "data.phone": { $regex: search, $options: "i" } }
+          { "data.phone": { $regex: search, $options: "i" } },
+          {serviceType: { $regex: search, $options: "i" } }
         ]
       }),
       ...(serviceType && { serviceType })
